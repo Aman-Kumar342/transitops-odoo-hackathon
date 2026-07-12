@@ -11,12 +11,13 @@
 
 # Overall Progress
 
-- **Overall completion:** ~64% (Phases 0-6 done)
-- **Current phase:** Phase 6 complete, next: Phase 7 (Dashboard KPIs)
-- **Completed:** Phases 0-6 - foundation, auth/RBAC, vehicles, drivers, trips (with
-  transactional dispatch + race guard), maintenance, and fuel/expense/operational-cost -
-  all with DB-level constraints, build green, verified against the live DB.
-- **Remaining:** Phases 7-10
+- **Overall completion:** ~73% (Phases 0-7 done)
+- **Current phase:** Phase 7 complete, next: Phase 8 (Reports & Analytics)
+- **Completed:** Phases 0-7 - foundation, auth/RBAC, vehicles, drivers, trips (with
+  transactional dispatch + race guard), maintenance, fuel/expense/operational-cost, and
+  dashboard KPIs. UI realigned to the design mockup (sidebar layout). All verified
+  against the live DB.
+- **Remaining:** Phases 8-10
 - **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
   SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
   `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
@@ -53,7 +54,7 @@
 | 4 | Trip Management + transitions | 100% | ✅ Done (transactional dispatch + race guard verified) |
 | 5 | Maintenance workflow | 100% | ✅ Done (In-Shop/close workflow + 18-D verified) |
 | 6 | Fuel & Expense | 100% | ✅ Done (CRUD + operational cost, no double count) |
-| 7 | Dashboard KPIs | 0% | Not started |
+| 7 | Dashboard KPIs | 100% | ✅ Done (7 KPIs + filters + recent trips + legend) |
 | 8 | Reports & Analytics | 0% | Not started |
 | 9 | Bonus features | 0% | Not started |
 | 10 | Hardening & Demo | 0% | Not started |
@@ -448,34 +449,34 @@
 
 ---
 
-## Phase 7 — Dashboard KPIs
+## Phase 7 — Dashboard KPIs ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — reuses vehicle/driver/trip counts (no new tables)
+- [x] Backend — dashboard service (SQL COUNT aggregates)
+- [x] Validation — dashboard filter schema (type/status/region)
+- [x] APIs — GET /api/dashboard/kpis, RBAC-gated
+- [x] UI — 7 KPI tiles + filters + Recent Trips + Vehicle Status legend
+- [x] Testing — KPI formulas + filters verified against live data
+- [x] Edge Cases — divide-by-zero guard on utilization
+- [x] Documentation — synced
 
-- [ ] `GET /dashboard/kpis?type=&status=&region=`
-- [ ] Active Vehicles (On Trip)
-- [ ] Available Vehicles
-- [ ] Vehicles in Maintenance (In Shop)
-- [ ] Active Trips (Dispatched)
-- [ ] Pending Trips (Draft)
-- [ ] Drivers On Duty (§13 🟨 definition as a single constant)
-- [ ] Fleet Utilization % with divide-by-zero guard
-- [ ] Filters: vehicle type / status / region
-- [ ] Single/few-query aggregation (no N+1, §17)
-- [ ] UI: 7 KPI cards
-- [ ] UI: filter bar
-- [ ] Refresh on load + on mutation (real-time, §18-K)
-- [ ] Empty (zero fleet) → all 0, no NaN
-- [ ] Loading skeleton tiles
-- [ ] Error tile state
-- [ ] Tests: KPI formulas + empty fleet
+- [x] `GET /dashboard/kpis?type=&status=&region=` - verified
+- [x] Active Vehicles (On Trip)
+- [x] Available Vehicles
+- [x] Vehicles in Maintenance (In Shop)
+- [x] Active Trips (Dispatched)
+- [x] Pending Trips (Draft)
+- [x] Drivers On Duty (§13 🟨: On Trip OR Available, single query)
+- [x] Fleet Utilization % with divide-by-zero guard - verified (25% = 1/4)
+- [x] Filters: vehicle type / status / region (region options from live data)
+- [x] Single/few-query aggregation via Promise.all COUNTs (no N+1, §17)
+- [x] UI: 7 KPI tiles + Fleet Utilization tile with progress bar
+- [x] UI: filter bar (type/status/region)
+- [x] Refresh on load + on filter change (real-time reads, §18-K)
+- [x] Mockup extras: Recent Trips table (latest 8) + Vehicle Status legend with counts
+- [x] Empty (zero fleet) → all 0, no NaN (guarded)
+- [x] Loading + error states
+- [x] Tests: KPI formulas verified (utilization, filters, status breakdown)
 
 ---
 

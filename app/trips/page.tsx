@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { LoadingState, EmptyState, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/status-badge";
+import { DataTable, Td } from "@/components/data-table";
 import { apiFetch } from "@/lib/client/api";
 import { can } from "@/lib/auth/rbac";
 import { TRIP_STATUS, TRIP_STATUS_LABELS, type TripStatusValue } from "@/lib/domain/trip";
@@ -82,25 +83,19 @@ export default function TripsPage() {
               action={canCreate && !status && !search ? <Link href="/trips/new" className="btn btn--primary">+ New trip</Link> : undefined}
             />
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                <thead>
-                  <tr><Th>Route</Th><Th>Vehicle</Th><Th>Driver</Th><Th>Cargo</Th><Th>Distance</Th><Th>Status</Th></tr>
-                </thead>
-                <tbody>
-                  {data.items.map((t) => (
-                    <tr key={t.id}>
-                      <Td><Link href={`/trips/${t.id}`} style={{ fontWeight: 600 }}>{t.source} → {t.destination}</Link></Td>
-                      <Td>{t.vehicle.registrationNumber}</Td>
-                      <Td>{t.driver.name}</Td>
-                      <Td>{t.cargoWeight} kg</Td>
-                      <Td>{t.plannedDistance} km</Td>
-                      <Td><StatusBadge status={t.status} label={t.statusLabel} /></Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable headers={["Route", "Vehicle", "Driver", "Cargo", "Distance", "Note", "Status"]}>
+              {data.items.map((t) => (
+                <tr key={t.id}>
+                  <Td><Link href={`/trips/${t.id}`} style={{ fontWeight: 600 }}>{t.source} → {t.destination}</Link></Td>
+                  <Td>{t.vehicle.registrationNumber}</Td>
+                  <Td>{t.driver.name}</Td>
+                  <Td>{t.cargoWeight} kg</Td>
+                  <Td>{t.plannedDistance} km</Td>
+                  <Td><span style={{ color: "var(--color-text-muted)", fontSize: 13 }}>{tripNote(t.status)}</span></Td>
+                  <Td><StatusBadge status={t.status} label={t.statusLabel} /></Td>
+                </tr>
+              ))}
+            </DataTable>
           )}
         </div>
 
@@ -131,9 +126,19 @@ function Tab({ active, onClick, children }: { active: boolean; onClick: () => vo
     </button>
   );
 }
-function Th({ children }: { children: React.ReactNode }) {
-  return <th style={{ textAlign: "left", padding: "var(--space-3)", borderBottom: "1px solid var(--color-border)", color: "var(--color-text-muted)", fontWeight: 600, whiteSpace: "nowrap" }}>{children}</th>;
-}
-function Td({ children }: { children: React.ReactNode }) {
-  return <td style={{ padding: "var(--space-3)", borderBottom: "1px solid var(--color-border)" }}>{children}</td>;
+
+/** Short human note derived from trip status (Live Board hint). */
+function tripNote(status: TripStatusValue): string {
+  switch (status) {
+    case TRIP_STATUS.DRAFT:
+      return "Awaiting dispatch";
+    case TRIP_STATUS.DISPATCHED:
+      return "In transit";
+    case TRIP_STATUS.COMPLETED:
+      return "Delivered";
+    case TRIP_STATUS.CANCELLED:
+      return "Cancelled";
+    default:
+      return "";
+  }
 }

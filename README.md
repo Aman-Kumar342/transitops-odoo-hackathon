@@ -8,6 +8,12 @@ real-time operational insight. Built for the **Odoo Hackathon 2026**.
 > prevents scheduling conflicts, overloading, expired-license dispatch, and blind spots
 > in cost and utilization.
 
+**🔗 Links**
+- **Repository:** https://github.com/Aman-Kumar342/transitops-odoo-hackathon
+- **Design mockup (Excalidraw):** https://link.excalidraw.com/l/65VNwvy7c4X/1FHGDNgD2td
+- **Live demo:** not publicly hosted — run locally in ~2 minutes (see [Run it](#run-it-2-minutes)).
+  The app is a Next.js server that talks to a local PostgreSQL database.
+
 ---
 
 ## Status
@@ -112,27 +118,50 @@ Track live progress in [`docs/checklist.md`](docs/checklist.md).
 
 ---
 
-## Getting Started
+## Run it (2 minutes)
+
+**Prerequisites:** Node.js 20+, and a **local PostgreSQL 14+** running (no cloud/BaaS,
+per the hackathon rules). Create an empty database first, e.g. `createdb transitops`.
 
 ```bash
-# 1. Install dependencies
+# 1. Clone and install
+git clone https://github.com/Aman-Kumar342/transitops-odoo-hackathon.git
+cd transitops-odoo-hackathon
 npm install
 
-# 2. Configure environment (copy and fill in DATABASE_URL, JWT_SECRET, ADMIN_*, DEMO_PASSWORD)
+# 2. Configure environment
 cp .env.example .env
+#    then edit .env and set:
+#    DATABASE_URL   -> your local Postgres, e.g. postgresql://USER:PASS@localhost:5432/transitops?schema=public
+#    JWT_SECRET     -> any 32+ char random string (openssl rand -base64 48)
+#    ADMIN_EMAIL / ADMIN_PASSWORD  -> the initial admin login you want
+#    DEMO_PASSWORD  -> shared password for the demo role accounts
 
-# 3. Apply migrations to a local PostgreSQL database
-npx prisma migrate deploy   # (or `npx prisma migrate dev` in development)
+# 3. Create the schema + seed data
+npx prisma migrate deploy   # apply migrations   (use `prisma migrate dev` in development)
+npm run seed                # roles + admin + one demo user per role
+npm run seed:demo           # a realistic demo fleet (vehicles, drivers, trips, costs)
 
-# 4. Seed roles + admin/demo users, then the demo fleet dataset
-npm run seed
-npm run seed:demo
-
-# 5. Run the app
-npm run dev                 # http://localhost:3000
+# 4. Start
+npm run dev                 # open http://localhost:3000
 ```
 
-See [`docs/demo.md`](docs/demo.md) for login accounts and a guided demo.
+The app opens at **http://localhost:3000** and redirects to the login.
+
+### Login accounts
+
+Passwords are whatever **you** set in `.env` (they are never committed). After seeding:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin (full access) | `admin@transitops.local` | your `ADMIN_PASSWORD` |
+| Fleet Manager | `fleet@transitops.local` | your `DEMO_PASSWORD` |
+| Driver | `driver@transitops.local` | your `DEMO_PASSWORD` |
+| Safety Officer | `safety@transitops.local` | your `DEMO_PASSWORD` |
+| Financial Analyst | `finance@transitops.local` | your `DEMO_PASSWORD` |
+
+Each role sees a different app (the sidebar is filtered by RBAC). Full walkthrough and a
+guided demo script are in [`docs/demo.md`](docs/demo.md).
 
 ---
 
@@ -145,5 +174,6 @@ See [`docs/demo.md`](docs/demo.md) for login accounts and a guided demo.
 
 ## Links
 
+- **Repository:** https://github.com/Aman-Kumar342/transitops-odoo-hackathon
+- **Design mockup (Excalidraw):** https://link.excalidraw.com/l/65VNwvy7c4X/1FHGDNgD2td
 - [Odoo Hackathon 2026](https://hackathon.odoo.com/)
-- Mockup: https://link.excalidraw.com/l/65VNwvy7c4X/1FHGDNgD2td

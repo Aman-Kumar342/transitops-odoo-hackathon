@@ -160,8 +160,9 @@ h3 {
 .sidebar {
   width: 224px;
   flex-shrink: 0;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  /* Dark product chrome (mockup #212529), dark in both light and dark themes. */
+  background: #212934;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -172,7 +173,7 @@ h3 {
 .sidebar__brand {
   padding: var(--space-4) var(--space-4) var(--space-3);
   font-weight: 700;
-  color: var(--color-primary);
+  color: #ffffff;
   font-size: 18px;
 }
 .sidebar__nav {
@@ -186,28 +187,30 @@ h3 {
   display: block;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  color: var(--color-text-muted);
+  color: #aeb6c2;
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
 }
 .sidebar__link:hover {
-  background: var(--color-surface-2);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
   text-decoration: none;
 }
 .sidebar__link--active {
   background: var(--color-primary);
-  color: var(--color-primary-contrast);
+  color: #ffffff;
 }
 .sidebar__link--active:hover {
   background: var(--color-primary-hover);
+  color: #ffffff;
 }
 .sidebar__foot {
   padding: var(--space-3) var(--space-4);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--color-text-muted);
-  border-top: 1px solid var(--color-border);
+  color: #7a828f;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .shell__main {
   flex: 1;

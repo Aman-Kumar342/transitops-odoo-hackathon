@@ -11,13 +11,12 @@
 
 # Overall Progress
 
-- **Overall completion:** ~45% (Phases 0-4 done)
-- **Current phase:** Phase 4 complete, next: Phase 5 (Maintenance workflow)
-- **Completed:** Phase 0 (foundation), Phase 1 (auth/RBAC/users), Phase 2 (vehicle
-  registry), Phase 3 (driver management), Phase 4 (trip management with transactional
-  dispatch/complete/cancel + race guard) - all with DB-level constraints, build green,
-  verified against the live DB.
-- **Remaining:** Phases 5-10
+- **Overall completion:** ~55% (Phases 0-5 done)
+- **Current phase:** Phase 5 complete, next: Phase 6 (Fuel & Expense Management)
+- **Completed:** Phases 0-5 - foundation, auth/RBAC, vehicles, drivers, trips (with
+  transactional dispatch + race guard), and maintenance (In-Shop/close workflow) - all
+  with DB-level constraints, build green, verified against the live DB.
+- **Remaining:** Phases 6-10
 - **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
   SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
   `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
@@ -52,7 +51,7 @@
 | 2 | Vehicle Registry | 100% | ✅ Done (CRUD + DB CHECKs + RBAC verified) |
 | 3 | Driver Management | 100% | ✅ Done (CRUD + status machine + eligibility verified) |
 | 4 | Trip Management + transitions | 100% | ✅ Done (transactional dispatch + race guard verified) |
-| 5 | Maintenance workflow | 0% | Not started |
+| 5 | Maintenance workflow | 100% | ✅ Done (In-Shop/close workflow + 18-D verified) |
 | 6 | Fuel & Expense | 0% | Not started |
 | 7 | Dashboard KPIs | 0% | Not started |
 | 8 | Reports & Analytics | 0% | Not started |
@@ -371,37 +370,38 @@
 
 ---
 
-## Phase 5 — Maintenance Workflow
+## Phase 5 — Maintenance Workflow ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — `maintenance_logs` migrated with enum, partial unique, cost CHECK
+- [x] Backend — maintenance service/repository with transactional open/close
+- [x] Validation — zod schemas (create/update/list) + DB CHECK backstop
+- [x] APIs — list/create(open)/detail/edit/close, RBAC-gated
+- [x] UI — list, create (Available-only picker), detail, close dialog, edit
+- [x] Testing — open/close side effects, 18-D, R10 retired, one-open, DB backstop verified
+- [x] Edge Cases — covered
+- [x] Documentation — synced
 
-- [ ] `maintenance_logs` table + migration (vehicle_id, type, description, cost, status, odometer_at_service 🟨, opened_at, closed_at, audit)
-- [ ] CHECK cost≥0; status enum Open/Closed
-- [ ] Partial unique: one Open record per vehicle
-- [ ] Index vehicle_id, status
-- [ ] `GET /maintenance` (list)
-- [ ] `POST /maintenance` (create → txn: Open + vehicle→In Shop, R9)
-- [ ] `GET /maintenance/:id`
-- [ ] `PUT /maintenance/:id`
-- [ ] `POST /maintenance/:id/close` (txn: vehicle→Available unless Retired, R10)
-- [ ] Block opening maintenance on an On-Trip vehicle (§18-D)
-- [ ] Vehicle removed from dispatch pool when In Shop (R2)
-- [ ] UI: maintenance list
-- [ ] UI: create form (vehicle picker excludes On-Trip)
-- [ ] UI: maintenance detail
-- [ ] UI: close dialog
-- [ ] Empty / loading / error states
-- [ ] Edge: two Open records blocked
-- [ ] Edge: close for Retired vehicle stays Retired (R10)
-- [ ] Edge: transactional rollback on failure (R9)
-- [ ] Tests: open/close transitions + status side effects
+- [x] `maintenance_logs` table + migration (vehicle_id, type, description, cost, status, odometer_at_service 🟨, opened_at, closed_at, audit)
+- [x] CHECK cost>=0 (raw SQL); status enum MaintenanceStatus Open/Closed
+- [x] Partial unique: one Open record per vehicle (raw SQL) - verified via DB backstop
+- [x] Index vehicle_id, status
+- [x] `GET /maintenance` (list)
+- [x] `POST /maintenance` (create -> txn: Open + vehicle->In Shop, R9) - verified
+- [x] `GET /maintenance/:id`
+- [x] `PUT /maintenance/:id`
+- [x] `POST /maintenance/:id/close` (txn: vehicle->Available unless Retired, R10) - verified
+- [x] Block opening maintenance on an On-Trip vehicle (§18-D) - verified 422
+- [x] Vehicle removed from dispatch pool when In Shop (R2) - verified
+- [x] UI: maintenance list
+- [x] UI: create form (Available-only vehicle picker; On-Trip/In-Shop/Retired excluded)
+- [x] UI: maintenance detail
+- [x] UI: close dialog (confirmation)
+- [x] Empty / loading / error states
+- [x] Edge: two Open records blocked (app 422 + DB partial-unique) - verified
+- [x] Edge: close for Retired vehicle stays Retired (R10) - verified
+- [x] Edge: transactional open/close (atomic record + vehicle status)
+- [x] Tests: open/close transitions + status side effects - verified
+- [x] RBAC verified: Fleet Manager/Financial read 200; Driver read 403
 
 ---
 

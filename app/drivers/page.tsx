@@ -22,6 +22,7 @@ interface ListResponse {
 
 export default function DriversPage() {
   const [role, setRole] = useState<string | null>(null);
+  const [expiring, setExpiring] = useState<DriverDTO[]>([]);
   const [data, setData] = useState<ListResponse | null>(null);
   const [status, setStatus] = useState<"" | DriverStatusValue>("");
   const [category, setCategory] = useState("");
@@ -34,6 +35,9 @@ export default function DriversPage() {
   useEffect(() => {
     apiFetch<{ role: { name: string } }>("/api/auth/me")
       .then((me) => setRole(me.role.name))
+      .catch(() => {});
+    apiFetch<DriverDTO[]>("/api/drivers/expiring-licenses?days=30")
+      .then(setExpiring)
       .catch(() => {});
   }, []);
 
@@ -71,6 +75,32 @@ export default function DriversPage() {
             </Link>
           )}
         </div>
+
+        {expiring.length > 0 && (
+          <div
+            className="card"
+            style={{
+              marginBottom: "var(--space-4)",
+              borderColor: "var(--color-warning)",
+              background: "rgba(183,121,31,0.08)",
+            }}
+          >
+            <strong style={{ color: "var(--color-warning)" }}>
+              ⚠ {expiring.length} driver{expiring.length > 1 ? "s" : ""} with licenses expiring soon or expired
+            </strong>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)", marginTop: "var(--space-2)" }}>
+              {expiring.map((d) => (
+                <Link
+                  key={d.id}
+                  href={`/drivers/${d.id}`}
+                  style={{ fontSize: 13, padding: "2px 10px", borderRadius: 999, background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                >
+                  {d.name} — {d.licenseExpired ? "expired" : `expires ${d.licenseExpiryDate}`}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", alignItems: "center", marginBottom: "var(--space-4)" }}>
           <input

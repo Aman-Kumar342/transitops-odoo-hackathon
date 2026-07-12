@@ -128,6 +128,21 @@ export const driverService = {
     return toDTO(driver);
   },
 
+  /**
+   * Drivers whose license is expiring within `days` (or already expired) - the in-app
+   * expiring-license reminder (bonus, PDF §8). Ordered by soonest expiry first.
+   */
+  async listExpiring(days: number): Promise<DriverDTO[]> {
+    const cutoff = new Date(todayUtc().getTime() + days * 24 * 60 * 60 * 1000);
+    const items = await driverRepository.findMany({
+      where: { deletedAt: null, licenseExpiryDate: { lte: cutoff } },
+      orderBy: { licenseExpiryDate: "asc" },
+      skip: 0,
+      take: 500,
+    });
+    return items.map(toDTO);
+  },
+
   /** Dispatch pool — eligible drivers only (R3): Available, not expired, not deleted. */
   async listAvailable(): Promise<DriverDTO[]> {
     const items = await driverRepository.findMany({

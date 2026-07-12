@@ -38,4 +38,15 @@ export const vehicleRepository = {
   update(id: number, data: Prisma.VehicleUpdateInput) {
     return prisma.vehicle.update({ where: { id }, data });
   },
+
+  /** Distinct non-null regions (for the dashboard region filter). */
+  async distinctRegions(): Promise<string[]> {
+    const rows = await prisma.vehicle.findMany({
+      where: { region: { not: null } },
+      distinct: ["region"],
+      select: { region: true },
+      orderBy: { region: "asc" },
+    });
+    return rows.map((r) => r.region).filter((r): r is string => r !== null);
+  },
 };

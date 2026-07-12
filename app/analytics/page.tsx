@@ -64,23 +64,36 @@ export default function AnalyticsPage() {
             <div className="split-2" style={{ marginTop: "var(--space-5)" }}>
               {/* Monthly revenue chart */}
               <div className="card">
-                <strong style={{ fontSize: 14 }}>Monthly Revenue (last 6 months)</strong>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: "var(--space-3)", height: 180, marginTop: "var(--space-4)" }}>
-                  {report.monthlyRevenue.map((m) => (
-                    <div key={m.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{m.revenue > 0 ? fmt(m.revenue) : ""}</div>
-                      <div
-                        title={`${m.month}: ${fmt(m.revenue)}`}
-                        style={{
-                          width: "70%",
-                          height: `${Math.max(2, (m.revenue / maxRevenue) * 140)}px`,
-                          background: "var(--color-primary)",
-                          borderRadius: "4px 4px 0 0",
-                        }}
-                      />
-                      <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{monthLabel(m.month)}</div>
-                    </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <strong style={{ fontSize: 14 }}>Monthly Revenue (last 6 months)</strong>
+                  <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>peak {fmt(maxRevenue)}</span>
+                </div>
+                {/* chart area with horizontal gridlines */}
+                <div style={{ position: "relative", height: 168, marginTop: "var(--space-4)" }}>
+                  {[1, 0.75, 0.5, 0.25].map((f) => (
+                    <div
+                      key={f}
+                      style={{ position: "absolute", left: 0, right: 0, bottom: `${f * 140 + 22}px`, borderTop: "1px dashed var(--color-border)" }}
+                    />
                   ))}
+                  <div style={{ position: "relative", display: "flex", alignItems: "flex-end", gap: "var(--space-3)", height: "100%" }}>
+                    {report.monthlyRevenue.map((m) => (
+                      <div key={m.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{m.revenue > 0 ? fmt(m.revenue) : ""}</div>
+                        <div
+                          title={`${m.month}: ${fmt(m.revenue)}`}
+                          style={{
+                            width: "62%",
+                            height: `${Math.max(2, (m.revenue / maxRevenue) * 140)}px`,
+                            background: "var(--color-primary)",
+                            borderRadius: "4px 4px 0 0",
+                            transition: "height 0.2s ease",
+                          }}
+                        />
+                        <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{monthLabel(m.month)}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: "var(--space-3)" }}>
                   Total revenue: {fmt(report.summary.totalRevenue)}

@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { LoadingState, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/status-badge";
+import { TripStepper } from "@/components/trip-stepper";
 import { apiFetch, ApiError } from "@/lib/client/api";
 import { can } from "@/lib/auth/rbac";
 import { TRIP_STATUS } from "@/lib/domain/trip";
@@ -77,6 +78,10 @@ export default function TripDetailPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
               <h1 style={{ fontSize: 22, margin: 0 }}>{trip.source} → {trip.destination}</h1>
               <StatusBadge status={trip.status} label={trip.statusLabel} />
+            </div>
+
+            <div style={{ marginBottom: "var(--space-4)" }}>
+              <TripStepper status={trip.status} />
             </div>
 
             <div className="card">

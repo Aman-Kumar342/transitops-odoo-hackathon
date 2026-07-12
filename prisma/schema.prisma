@@ -61,6 +61,8 @@ model Vehicle {
   retiredAt          DateTime?        @map("retired_at")
   trips              Trip[]
   maintenanceLogs    MaintenanceLog[]
+  fuelLogs           FuelLog[]
+  expenses           Expense[]
   createdAt          DateTime         @default(now()) @map("created_at")
   updatedAt          DateTime         @updatedAt @map("updated_at")
 
@@ -184,6 +186,8 @@ model Trip {
   cancelledAt     DateTime?  @map("cancelled_at")
   createdById     Int?       @map("created_by")
   createdBy       User?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  fuelLogs        FuelLog[]
+  expenses        Expense[]
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
@@ -192,4 +196,56 @@ model Trip {
   @@index([driverId])
   @@index([createdAt])
   @@map("trips")
+}
+
+/// Fuel purchase/consumption records (problem.md §4.7, §6.7, §12). Feeds Operational
+/// Cost and Fuel Efficiency. DB CHECK: liters > 0, cost >= 0.
+model FuelLog {
+  id        Int      @id @default(autoincrement())
+  vehicleId Int      @map("vehicle_id")
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  tripId    Int?     @map("trip_id")
+  trip      Trip?    @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  liters    Decimal  @db.Decimal(10, 2)
+  cost      Decimal  @db.Decimal(14, 2)
+  date      DateTime @db.Date
+  odometer  Decimal? @db.Decimal(12, 2)
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([vehicleId])
+  @@index([date])
+  @@index([tripId])
+  @@map("fuel_logs")
+}
+
+/// Non-fuel, non-maintenance operational expenses (tolls, parking, etc.). Kept a
+/// SEPARATE ledger so it never double-counts against fuel_logs / maintenance_logs, which
+/// are the single sources of truth for the Fuel + Maintenance operational cost (§18-E).
+enum ExpenseCategory {
+  TOLL
+  PARKING
+  INSURANCE
+  FINE
+  MISC
+}
+
+model Expense {
+  id          Int             @id @default(autoincrement())
+  vehicleId   Int             @map("vehicle_id")
+  vehicle     Vehicle         @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  tripId      Int?            @map("trip_id")
+  trip        Trip?           @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  category    ExpenseCategory
+  amount      Decimal         @db.Decimal(14, 2)
+  date        DateTime        @db.Date
+  description String?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([vehicleId])
+  @@index([category])
+  @@index([date])
+  @@map("expenses")
 }

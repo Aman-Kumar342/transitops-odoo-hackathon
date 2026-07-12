@@ -55,14 +55,36 @@ async function main() {
 
   if (existing) {
     console.log(`✔ Admin user already exists (${email}) — left unchanged`);
-    return;
+  } else {
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.user.create({
+      data: { email, name, passwordHash, roleId: adminRole.id, isActive: true },
+    });
+    console.log(`✔ Created admin user: ${email}`);
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({
-    data: { email, name, passwordHash, roleId: adminRole.id, isActive: true },
-  });
-  console.log(`✔ Created admin user: ${email}`);
+  // 3. Optional demo users, one per non-admin role (for RBAC demos/testing).
+  const demoPassword = process.env.DEMO_PASSWORD;
+  if (!demoPassword) {
+    console.warn("⚠ DEMO_PASSWORD not set — skipping demo users.");
+    return;
+  }
+  const demoUsers: { email: string; name: string; role: string }[] = [
+    { email: "fleet@transitops.local", name: "Fleet Manager", role: "Fleet Manager" },
+    { email: "driver@transitops.local", name: "Demo Driver", role: "Driver" },
+    { email: "safety@transitops.local", name: "Safety Officer", role: "Safety Officer" },
+    { email: "finance@transitops.local", name: "Financial Analyst", role: "Financial Analyst" },
+  ];
+  const demoHash = await bcrypt.hash(demoPassword, 10);
+  for (const u of demoUsers) {
+    const exists = await prisma.user.findUnique({ where: { email: u.email } });
+    if (exists) continue;
+    const role = await prisma.role.findUniqueOrThrow({ where: { name: u.role } });
+    await prisma.user.create({
+      data: { email: u.email, name: u.name, passwordHash: demoHash, roleId: role.id, isActive: true },
+    });
+    console.log(`✔ Created demo user: ${u.email} (${u.role})`);
+  }
 }
 
 main()

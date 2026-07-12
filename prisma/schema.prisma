@@ -36,6 +36,38 @@ model Role {
   @@map("roles")
 }
 
+/// Vehicle lifecycle states (problem.md §3.3, §7.1). Closed set.
+enum VehicleStatus {
+  AVAILABLE
+  ON_TRIP
+  IN_SHOP
+  RETIRED
+}
+
+/// Fleet assets (problem.md §4.3, §6.3, §12).
+/// DB-level guarantees added via raw SQL in the migration (CHECK on capacity/odometer/
+/// acquisition_cost/type, and normalized-uppercase registration_number) so invalid data
+/// is rejected even if the API is bypassed.
+model Vehicle {
+  id                 Int           @id @default(autoincrement())
+  registrationNumber String        @unique @map("registration_number")
+  nameModel          String        @map("name_model")
+  type               String
+  maxLoadCapacity    Decimal       @map("max_load_capacity") @db.Decimal(12, 2)
+  odometer           Decimal       @default(0) @db.Decimal(12, 2)
+  acquisitionCost    Decimal       @map("acquisition_cost") @db.Decimal(14, 2)
+  status             VehicleStatus @default(AVAILABLE)
+  region             String?
+  retiredAt          DateTime?     @map("retired_at")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([type])
+  @@index([region])
+  @@map("vehicles")
+}
+
 /// Authenticated accounts. Password is always stored hashed (bcrypt) — never plaintext.
 model User {
   id           Int       @id @default(autoincrement())

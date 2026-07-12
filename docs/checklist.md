@@ -11,11 +11,11 @@
 
 # Overall Progress
 
-- **Overall completion:** ~18% (Phases 0–1 done)
-- **Current phase:** Phase 1 complete → next: Phase 2 (Vehicle Registry)
-- **Completed:** Phase 0 (foundation) + Phase 1 (auth, RBAC, users/roles) — build green,
-  verified in dev and production against the live DB.
-- **Remaining:** Phases 2–10
+- **Overall completion:** ~27% (Phases 0–2 done)
+- **Current phase:** Phase 2 complete → next: Phase 3 (Driver Management)
+- **Completed:** Phase 0 (foundation) + Phase 1 (auth/RBAC/users) + Phase 2 (vehicle
+  registry CRUD w/ DB-level constraints) — build green, verified against the live DB.
+- **Remaining:** Phases 3–10
 - **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
   SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
   `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
@@ -47,7 +47,7 @@
 |------:|-------|--:|--------|
 | 0 | Foundation | 100% | ✅ Done (DB live on VPS via tunnel) |
 | 1 | Auth & RBAC & Users/Roles | 100% | ✅ Done (verified dev + prod) |
-| 2 | Vehicle Registry | 0% | Not started |
+| 2 | Vehicle Registry | 100% | ✅ Done (CRUD + DB CHECKs + RBAC verified) |
 | 3 | Driver Management | 0% | Not started |
 | 4 | Trip Management + transitions | 0% | Not started |
 | 5 | Maintenance workflow | 0% | Not started |
@@ -157,67 +157,73 @@
 
 ---
 
-## Phase 2 — Vehicle Registry (CRUD)
+## Phase 2 — Vehicle Registry (CRUD) ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — `vehicles` migrated with enum, indexes, CHECK constraints
+- [x] Backend — vehicle service/repository, layered
+- [x] Validation — zod schemas (FE+BE) + DB CHECK backstop
+- [x] APIs — full CRUD + available pool + filters/search/sort/pagination
+- [x] UI — list, form (create/edit), detail, retire dialog, all states
+- [x] Testing — API smoke-tested (CRUD, rules, RBAC, DB backstop) + prod build
+- [x] Edge Cases — dup reg no, odometer decrease, retire-on-trip, retired-edit
+- [x] Documentation — synced
 
 **Database / Model**
-- [ ] `vehicles` table + migration
-- [ ] Fields: reg no, name/model, type, max_load_capacity, odometer, acquisition_cost, status, region 🟨, retired_at, audit
-- [ ] UNIQUE(registration_number) normalized (§18-J)
-- [ ] CHECK capacity>0, odometer≥0, acquisition_cost≥0
-- [ ] Status enum (Available/On Trip/In Shop/Retired)
-- [ ] Indexes: status, type, region, registration_number
-- [ ] Model
+- [x] `vehicles` table + migration
+- [x] Fields: reg no, name/model, type, max_load_capacity, odometer, acquisition_cost, status, region 🟨, retired_at, audit
+- [x] UNIQUE(registration_number) + normalized-form CHECK (§18-J) — case/space-insensitive
+- [x] CHECK capacity>0, odometer≥0, acquisition_cost≥0 (raw SQL in migration)
+- [x] CHECK type ∈ allowed set (raw SQL) — DB enforces the closed set
+- [x] Status enum VehicleStatus (Available/On Trip/In Shop/Retired)
+- [x] Indexes: status, type, region, registration_number
+- [x] Model (Prisma)
 
 **Validation**
-- [ ] Unique reg no (R1) — async FE check + BE + DB
-- [ ] Reg-no trim+uppercase normalization (§18-J)
-- [ ] Numeric ranges (R14)
-- [ ] Odometer monotonic non-decreasing on update (R11)
-- [ ] Status transition validation (§7.1)
+- [x] Unique reg no (R1) — async FE check + BE re-check + DB unique (all verified)
+- [x] Reg-no trim+collapse+uppercase normalization (§18-J) — verified via " mh-12.. "→"MH-12.."
+- [x] Numeric ranges (R14) — zod + DB CHECK
+- [x] Odometer monotonic non-decreasing on update (R11) — verified 422
+- [x] Status: create→Available; only retire changes it here (trips/maintenance in P4/P5)
 
 **APIs**
-- [ ] `GET /vehicles` (list)
-- [ ] `POST /vehicles` (create)
-- [ ] `GET /vehicles/:id` (detail)
-- [ ] `PUT /vehicles/:id` (update)
-- [ ] `DELETE /vehicles/:id` (soft delete = Retire)
-- [ ] `GET /vehicles/available` (dispatch pool, status=Available)
-- [ ] `GET /vehicles/:id/operational-cost`
-- [ ] Search
-- [ ] Filters (type/status/region)
-- [ ] Sorting (whitelisted)
-- [ ] Pagination
-- [ ] Duplicate-reg-no validation → 409
+- [x] `GET /vehicles` (list)
+- [x] `POST /vehicles` (create)
+- [x] `GET /vehicles/:id` (detail)
+- [x] `PUT /vehicles/:id` (update)
+- [x] `DELETE /vehicles/:id` (soft delete = Retire)
+- [x] `GET /vehicles/available` (dispatch pool, status=Available) — verified 0 after retire
+- [ ] `GET /vehicles/:id/operational-cost` — **deferred to Phase 6** (needs fuel+maintenance data)
+- [x] Search (reg no + name, case-insensitive)
+- [x] Filters (type/status/region)
+- [x] Sorting (whitelisted fields via API)
+- [x] Pagination
+- [x] Duplicate-reg-no validation → 409 (verified, incl. case/space variant)
+- [x] RBAC on every endpoint (verified: Driver 403 create/delete, 200 read; FM 201 create)
 
 **UI**
-- [ ] Vehicle list table
-- [ ] Search + filters + sort controls
-- [ ] Create form (inline + async validation)
-- [ ] Edit form
-- [ ] Vehicle detail (history tabs)
-- [ ] Retire confirm dialog
-- [ ] Empty state
-- [ ] Loading state
-- [ ] Error state
+- [x] Vehicle list table
+- [x] Search + status/type filters (sort exposed via API; header-sort UI optional/later)
+- [x] Create form (inline validation + async reg-no uniqueness check)
+- [x] Edit form
+- [x] Vehicle detail (info card; history tabs arrive with trips/maintenance/fuel)
+- [x] Retire confirm dialog (inline, guarded when On-Trip)
+- [x] Empty state
+- [x] Loading state
+- [x] Error state
 
 **Edge cases (§15)**
-- [ ] Duplicate reg no (case/whitespace) rejected
-- [ ] Retire an On-Trip vehicle blocked (§7.1)
-- [ ] Decreasing odometer rejected
+- [x] Duplicate reg no (case/whitespace) rejected — verified 409
+- [x] Retire an On-Trip vehicle blocked (§7.1) — guard in service + UI disabled
+- [x] Decreasing odometer rejected (R11) — verified 422
+- [x] DB CHECK backstop: direct invalid SQL insert rejected (regno/capacity/type) — verified
 
 **Testing**
-- [ ] CRUD unit tests
-- [ ] Uniqueness integration test
-- [ ] Available-pool filter test
+- [x] CRUD smoke tests (create/read/update/retire) — verified
+- [x] Uniqueness (case/space) integration test — verified
+- [x] Available-pool filter test — verified
+- [x] Cross-role RBAC test (Driver vs Fleet Manager) — verified
+- [ ] Automated unit/integration test suite — deferred (manual verification done; add
+      a test runner in a later hardening pass)
 
 ---
 
@@ -535,8 +541,8 @@
       exist (Phase 2: e.g., Driver cannot POST /vehicles).
 - [ ] Revisit remaining `npm audit` items later (fix requires Next 16 major bump —
       deferred to avoid breaking the React 18 setup).
-- [ ] **DB seed of demo users per role** (Fleet Manager, Driver, etc.) for RBAC demos —
-      add in a later phase or extend seed.
+- [x] ~~DB seed of demo users per role~~ — done (fleet/driver/safety/finance demo users,
+      `DEMO_PASSWORD` in `.env`); used to verify cross-role 403.
 
 ### ⚠️ Build/ops lessons (do not repeat)
 - **Never set `NODE_ENV` in `.env`.** It leaks into `next build` and forces React's dev

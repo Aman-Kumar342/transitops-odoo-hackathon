@@ -15,6 +15,7 @@ interface Me {
 // Nav grows as modules land in later phases.
 const NAV: { href: string; label: string }[] = [
   { href: "/", label: "Dashboard" },
+  { href: "/vehicles", label: "Vehicles" },
   { href: "/settings", label: "Settings" },
 ];
 

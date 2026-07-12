@@ -1,4 +1,4 @@
-import { z, type ZodSchema } from "zod";
+import { z, type ZodTypeAny } from "zod";
 import { ValidationError } from "@/lib/http/errors";
 
 /**
@@ -9,8 +9,14 @@ import { ValidationError } from "@/lib/http/errors";
  * Domain schemas (vehicle, driver, trip, …) are added in their respective phases.
  */
 
-/** Parse unknown input against a schema, throwing a typed ValidationError on failure. */
-export function parseOrThrow<T>(schema: ZodSchema<T>, input: unknown): T {
+/**
+ * Parse unknown input against a schema, throwing a typed ValidationError on failure.
+ * Returns the schema's OUTPUT type, so `.default()`/`.transform()` results are reflected.
+ */
+export function parseOrThrow<S extends ZodTypeAny>(
+  schema: S,
+  input: unknown,
+): z.output<S> {
   const result = schema.safeParse(input);
   if (!result.success) {
     throw ValidationError(
@@ -22,10 +28,10 @@ export function parseOrThrow<T>(schema: ZodSchema<T>, input: unknown): T {
 }
 
 /** Parse a request's JSON body against a schema. */
-export async function parseJsonBody<T>(
+export async function parseJsonBody<S extends ZodTypeAny>(
   req: Request,
-  schema: ZodSchema<T>,
-): Promise<T> {
+  schema: S,
+): Promise<z.output<S>> {
   let body: unknown;
   try {
     body = await req.json();

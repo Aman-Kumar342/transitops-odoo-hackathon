@@ -11,8 +11,9 @@
 
 # Overall Progress
 
-- **Overall completion:** ~88% (Phases 0-9 done; Phase 10 hardening remains)
-- **Current phase:** Phase 9 (bonus) done, next: Phase 10 (hardening & demo)
+- **Overall completion:** ~98% (Phases 0-10 done). Remaining items are team actions
+  (multi-author commits, presentation), not code.
+- **Current phase:** Phase 10 complete. Build green, verified end-to-end against the live DB.
 - **Completed:** Phases 0-8 - foundation, auth/RBAC, vehicles, drivers, trips (with
   transactional dispatch + race guard), maintenance, fuel/expense/operational-cost,
   dashboard KPIs, and reports/analytics (fuel efficiency, utilization, operational cost,
@@ -58,7 +59,7 @@
 | 7 | Dashboard KPIs | 100% | ✅ Done (7 KPIs + filters + recent trips + legend) |
 | 8 | Reports & Analytics | 100% | ✅ Done (4 metrics + ROI + CSV export verified) |
 | 9 | Bonus features | 80% | ✅ Dark mode + expiring-license reminders + charts (PDF/docs skipped) |
-| 10 | Hardening & Demo | 0% | Not started |
+| 10 | Hardening & Demo | 95% | ✅ Demo seed + full verification (team/presentation items remain) |
 
 ### How to update this file
 1. When you start a task, note it under "Current phase" (only one in progress).
@@ -531,20 +532,24 @@ management - both lower value than the hardening pass and either need a heavy de
 
 ---
 
-## Phase 10 — Hardening & Demo
+## Phase 10 — Hardening & Demo ✅
 
-- [ ] Security pass (§16): hashing, RBAC server-side, param queries, mass-assignment whitelist, secrets in env
-- [ ] Broken-access-control test across every role/route
-- [ ] Performance/index pass (§17): all FKs + filter columns indexed, pagination everywhere
-- [ ] Run all §15 edge-case tests
-- [ ] Seed realistic demo data
-- [ ] Rehearse the §5 example workflow end-to-end (Van-05 / Alex / 450kg)
-- [ ] Verify CSV export
-- [ ] Responsive check across screen sizes
-- [ ] Consistent theme/navigation audit
-- [ ] Confirm real-time/dynamic data (no static JSON in prod paths)
-- [ ] Git: confirm every team member has meaningful commits
-- [ ] Presentation prep (shared ownership)
+- [x] Security pass (§16): bcrypt hashing verified, RBAC enforced server-side, Prisma
+      parameterized queries, mass-assignment whitelisted, secrets in env (`.env` untracked)
+- [x] Broken-access-control sweep across roles/routes — no leaks (see docs/demo.md §5)
+- [x] Performance/index pass (§17): index audit (trips 7, vehicles/drivers 5, logs 4);
+      all FKs + filter columns indexed; pagination on all lists; SQL-aggregate KPIs
+- [x] Edge-case checks (§15): cargo/capacity, odometer, terminal states, race guard,
+      In-Shop/On-Trip, expiry boundary, divide-by-zero — verified across phases
+- [x] Seed realistic demo data (`npm run seed:demo`)
+- [x] Rehearse the §5 example workflow end-to-end (Van-05 / Alex / 450kg) — ✅ verified
+- [x] Verify CSV export (text/csv + attachment) — verified
+- [x] Responsive check — sidebar collapses to a hamburger drawer on narrow screens
+- [x] Consistent theme/navigation audit — shared shell, tokens, badges, light/dark
+- [x] Confirm real-time/dynamic data (no static JSON in prod paths) — all reads hit DB
+- [ ] Git: every team member has meaningful commits — **team action** (single-author so
+      far per repo owner's setup; collaborators to be added by the owner)
+- [ ] Presentation prep (shared ownership) — **team action**
 
 ---
 

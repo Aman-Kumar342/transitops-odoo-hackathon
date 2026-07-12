@@ -12,10 +12,17 @@ real-time operational insight. Built for the **Odoo Hackathon 2026**.
 
 ## Status
 
-🟡 **Pre-implementation — documentation phase complete, awaiting Phase 0 kickoff.**
+🟢 **All 8 mandatory deliverables implemented and verified against a live database.**
 
-This repository is **documentation-driven**: the specification and roadmap are written
-and reviewed *before* any production code. See [`docs/`](#documentation).
+Responsive UI · Auth + RBAC · CRUD for Vehicles & Drivers · Trip Management with
+validations · Automatic status transitions · Maintenance workflow · Fuel & Expense
+tracking · Dashboard with KPIs — **plus** Reports & Analytics (Fuel Efficiency, Fleet
+Utilization, Operational Cost, Vehicle ROI) with CSV export, and bonus features
+(dark mode, in-app expiring-license reminders, charts).
+
+This repository is **documentation-driven**: the specification and roadmap were written
+and reviewed *before* the code. See [`docs/`](#documentation) — and
+[`docs/demo.md`](docs/demo.md) for how to run and present it.
 
 ---
 
@@ -28,6 +35,7 @@ Read these before touching any code — in this order:
 | [`docs/problem.md`](docs/problem.md) | **Single source of truth** — full system analysis: modules, business rules (R1–R18), entities, status machines, workflows, APIs, DB schema, KPIs, analytics, edge cases, security, assumptions. |
 | [`docs/checklist.md`](docs/checklist.md) | **Living implementation tracker** — phased tasks with progress %, decisions, and traceable engineering assumptions. |
 | [`docs/guidelines.md`](docs/guidelines.md) | **Engineering handbook** — how this repo is developed (source-of-truth priority, mandatory workflow, business-rule enforcement, definition of done). |
+| [`docs/demo.md`](docs/demo.md) | **Demo & verification guide** — run steps, login accounts, seeded story, live demo script, verification results. |
 | [`expectation.md`](expectation.md) | Evaluator's coding standards and evaluation criteria. |
 
 ---
@@ -106,25 +114,25 @@ Track live progress in [`docs/checklist.md`](docs/checklist.md).
 
 ## Getting Started
 
-> ⚠️ Setup steps below are the **planned** flow for Phase 0. The application is not yet
-> scaffolded. This section will be finalized when Phase 0 lands.
-
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Configure environment (copy and fill in DATABASE_URL, JWT secret, etc.)
+# 2. Configure environment (copy and fill in DATABASE_URL, JWT_SECRET, ADMIN_*, DEMO_PASSWORD)
 cp .env.example .env
 
-# 3. Provision the database (local PostgreSQL)
-npx prisma migrate dev
+# 3. Apply migrations to a local PostgreSQL database
+npx prisma migrate deploy   # (or `npx prisma migrate dev` in development)
 
-# 4. Seed roles + demo data
+# 4. Seed roles + admin/demo users, then the demo fleet dataset
 npm run seed
+npm run seed:demo
 
 # 5. Run the app
-npm run dev
+npm run dev                 # http://localhost:3000
 ```
+
+See [`docs/demo.md`](docs/demo.md) for login accounts and a guided demo.
 
 ---
 

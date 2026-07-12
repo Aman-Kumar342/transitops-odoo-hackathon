@@ -23,8 +23,10 @@ are missing secondary panels shown in the design.
 
 > **Fix progress:** P1 (Critical) **done** — blue accent, dark sidebar, split-panel login.
 > P2 (Important) **done** — Settings General + live RBAC matrix, trip lifecycle stepper,
-> driver "Trip Compl." column, fuel-expense operational-cost strip. Together these lift
-> the projected match to **~88**. Remaining: P3 (polish), P4 (nice-to-have).
+> driver "Trip Compl." column, fuel-expense operational-cost strip.
+> P3 (Polish) **done** — destructive/ghost button variants, `:focus-visible` ring, table
+> row hover, fixed 4-col KPI grid + responsive split sections, maintenance state-flow
+> strip. Projected match now **~92**. Remaining: P4 (nice-to-have).
 
 | Category | Score | One-line reason |
 |---|:---:|---|
@@ -298,14 +300,14 @@ Effort key: XS ≈ <15 min · S ≈ 15–45 min · M ≈ 1–2 h · L ≈ half-d
 | 6 | Drivers table | Add **"Trip Compl."** column (completed-trip count/%) | Column parity with mockup | Med (needs per-driver aggregate) | M | ✅ done |
 | 7 | Fuel & Expenses | **Fleet operational-cost summary strip** (Fuel + Maintenance total) on-screen | Headline number appears where the mockup shows it | Low | S | ✅ done |
 
-## Priority 3 — Polish (raise Visual Fidelity/consistency)
-| # | Page/Component | Issue | Expected outcome | Complexity | Effort |
-|---|---|---|---|---|---|
-| 8 | Buttons | Add **destructive (red)** and ghost/secondary variants; use red for Retire/Delete | Clear action semantics, matches mockup emphasis | Low | S |
-| 9 | Tables | Shared `<DataTable>`/`Th`/`Td` + subtle **row hover**; tighten label/text size to 12–13 | Uniform, denser tables matching the mockup | Low | M |
-| 10 | Dashboard/Analytics | Constrain KPI grid to **4 columns** at desktop; stack 2-col sections on tablet/mobile | Grid matches mockup at all widths | Low | S |
-| 11 | Maintenance | Small **state-flow strip** (Available→In Shop→Available) | Visual reinforcement of R9/R10 | Low | S |
-| 12 | Global | `:focus-visible` ring on interactive elements | Stronger keyboard a11y | Low | XS |
+## Priority 3 — Polish (raise Visual Fidelity/consistency) — ✅ DONE
+| # | Page/Component | Issue | Expected outcome | Complexity | Effort | Status |
+|---|---|---|---|---|---|---|
+| 8 | Buttons | Add **destructive (red)** and ghost/secondary variants; use red for Retire/Deactivate | Clear action semantics, matches mockup emphasis | Low | S | ✅ done |
+| 9 | Tables | Subtle **row hover** on all data tables (shared `<DataTable>` extraction deferred to P4-15) | Uniform, scannable tables | Low | S | ✅ (hover) |
+| 10 | Dashboard/Analytics | KPI grid to **4 columns** at desktop; stack 2-col sections on tablet/mobile (`.stat-grid`/`.split-2`) | Grid matches mockup at all widths | Low | S | ✅ done |
+| 11 | Maintenance | Small **state-flow strip** (Available→In Shop→Available) | Visual reinforcement of R9/R10 | Low | S | ✅ done |
+| 12 | Global | `:focus-visible` ring on interactive elements | Stronger keyboard a11y | Low | XS | ✅ done |
 
 ## Priority 4 — Nice to have
 | # | Page/Component | Issue | Expected outcome | Complexity | Effort |

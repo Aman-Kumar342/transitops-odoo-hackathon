@@ -22,12 +22,17 @@ export async function getSession(): Promise<Session | null> {
   return verifySession(token);
 }
 
-/** Cookie options — httpOnly (no JS access), sameSite lax, secure in production. */
+/**
+ * Cookie options — httpOnly (no JS access), sameSite lax. `secure` is tied to whether the
+ * app is actually served over HTTPS (APP_URL), NOT to NODE_ENV: a Secure cookie is
+ * silently dropped by browsers over plain HTTP, which would break login on an
+ * HTTP-only deployment. When APP_URL is https the cookie is Secure as expected.
+ */
 function cookieOptions() {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: env.NODE_ENV === "production",
+    secure: env.APP_URL.startsWith("https://"),
     path: "/",
     maxAge: ONE_DAY_SECONDS,
   };

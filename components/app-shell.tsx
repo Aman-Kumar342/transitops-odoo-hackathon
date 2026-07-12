@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client/api";
 import { can, type Resource } from "@/lib/auth/rbac";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface Me {
   id: number;
@@ -108,6 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-label="Search"
             />
           </form>
+          <ThemeToggle />
           {me && (
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
               <span style={{ textAlign: "right", lineHeight: 1.2 }}>

@@ -1238,6 +1238,24 @@ recommendations, not invented requirements.**
 - **§18-N — Trip start odometer.** To compute per-trip distance from odometer, capture
   `start_odometer` at dispatch (= vehicle odometer then). Assumption to enable R11 &
   efficiency.
+- **§18-O — Design mockup alignment (decided 2026-07-12).** The official Excalidraw
+  mockup (8 screens) was reviewed. Decisions:
+  - **Layout:** adopt the mockup's **left sidebar + top bar** (global search + user
+    avatar chip). Nav labels follow the mockup: **Fleet** (route `/vehicles`), **Fuel &
+    Expenses** (one combined screen, route `/fuel-expenses`), **Analytics** (route
+    `/analytics`).
+  - **Role naming conflict:** the mockup labels the 4th role **"Dispatcher"**, the PDF
+    §2 says **"Driver"**. Per the source-of-truth priority (PDF = Priority 1) and the
+    user's explicit decision, we **keep "Driver"**. Note: the mockup's "Dispatcher →
+    Dashboard, Trips" confirms the intent behind the PDF's ambiguous "Driver creates
+    trips" (§18-A) — same behavior, different label.
+  - **Login extras in mockup** (role dropdown at login, remember-me, forgot-password,
+    lockout after 5 fails): the role-at-login selector is intentionally NOT adopted —
+    role is derived from the user account (more secure, no client-chosen privilege).
+    Remember-me / forgot-password / lockout are optional polish (bonus, later).
+  - Mockup-confirmed screens still to build: Dashboard widgets (Recent Trips table +
+    Vehicle Status legend) in Phase 7; Analytics cards + Monthly Revenue + Top Costliest
+    Vehicles in Phase 8; Settings general fields (depot/currency/unit) as polish.
 
 ---
 

@@ -9,10 +9,31 @@ real-time operational insight. Built for the **Odoo Hackathon 2026**.
 > in cost and utilization.
 
 **🔗 Links**
+- **🚀 Live demo:** **http://69.62.76.226:3001** — open it and use the whole app (no install).
 - **Repository:** https://github.com/Aman-Kumar342/transitops-odoo-hackathon
 - **Design mockup (Excalidraw):** https://link.excalidraw.com/l/65VNwvy7c4X/1FHGDNgD2td
-- **Live demo:** not publicly hosted — run locally in ~2 minutes (see [Run it](#run-it-2-minutes)).
-  The app is a Next.js server that talks to a local PostgreSQL database.
+
+---
+
+## 🚀 Live demo
+
+Open **http://69.62.76.226:3001** in any browser and sign in — no setup required.
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** (full access) | `admin@transitops.local` | `Transitops2026` |
+| Fleet Manager | `fleet@transitops.local` | `Transitops2026` |
+| Driver | `driver@transitops.local` | `Transitops2026` |
+| Safety Officer | `safety@transitops.local` | `Transitops2026` |
+| Financial Analyst | `finance@transitops.local` | `Transitops2026` |
+
+Each role sees a different app (the sidebar is filtered by RBAC). Sign in as **Admin** to do
+everything. It's a shared demo, so the data may be changed by others — it can be reset from
+the seed at any time.
+
+> Notes: the demo is served over plain HTTP (an IP:port has no TLS certificate), so the
+> browser may show "Not secure" — that's expected for a demo link. The app runs on the
+> team's VPS under pm2, talking to a local PostgreSQL database on the same server.
 
 ---
 

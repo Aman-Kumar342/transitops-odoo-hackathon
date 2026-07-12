@@ -55,6 +55,21 @@ export default function MaintenancePage() {
           {canCreate && <Link href="/maintenance/new" className="btn btn--primary">+ New record</Link>}
         </div>
 
+        {/* Workflow strip (R9/R10): opening a record sends the vehicle In Shop; closing restores it. */}
+        <div
+          className="card"
+          style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap", marginBottom: "var(--space-4)", padding: "var(--space-3) var(--space-4)", fontSize: 13 }}
+        >
+          <FlowNode label="Available" />
+          <Arrow note="open record" />
+          <FlowNode label="In Shop" tone="warning" />
+          <Arrow note="close record" />
+          <FlowNode label="Available" />
+          <span style={{ color: "var(--color-text-muted)", marginLeft: "auto" }}>
+            In-Shop vehicles are hidden from the dispatch pool.
+          </span>
+        </div>
+
         <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", marginBottom: "var(--space-4)" }}>
           <input placeholder="Search type…" value={search} onChange={(e) => { setPage(1); setSearch(e.target.value); }} style={filterInput} />
           <select value={status} onChange={(e) => { setPage(1); setStatus(e.target.value as MaintenanceStatusValue | ""); }} style={filterInput}>
@@ -107,5 +122,31 @@ export default function MaintenancePage() {
 }
 
 const filterInput: React.CSSProperties = { padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)", font: "inherit" };
+
+function FlowNode({ label, tone }: { label: string; tone?: "warning" }) {
+  const warn = tone === "warning";
+  return (
+    <span
+      style={{
+        padding: "4px 12px",
+        borderRadius: 999,
+        fontWeight: 600,
+        fontSize: 12,
+        background: warn ? "rgba(183,121,31,0.16)" : "var(--color-surface-2)",
+        color: warn ? "var(--status-inshop)" : "var(--color-text)",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+function Arrow({ note }: { note: string }) {
+  return (
+    <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", color: "var(--color-text-muted)" }}>
+      <span style={{ fontSize: 10 }}>{note}</span>
+      <span aria-hidden>→</span>
+    </span>
+  );
+}
 function Th({ children }: { children: React.ReactNode }) { return <th style={{ textAlign: "left", padding: "var(--space-3)", borderBottom: "1px solid var(--color-border)", color: "var(--color-text-muted)", fontWeight: 600, whiteSpace: "nowrap" }}>{children}</th>; }
 function Td({ children }: { children: React.ReactNode }) { return <td style={{ padding: "var(--space-3)", borderBottom: "1px solid var(--color-border)" }}>{children}</td>; }

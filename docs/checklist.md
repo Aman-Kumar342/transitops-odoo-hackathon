@@ -11,13 +11,14 @@
 
 # Overall Progress
 
-- **Overall completion:** ~73% (Phases 0-7 done)
-- **Current phase:** Phase 7 complete, next: Phase 8 (Reports & Analytics)
-- **Completed:** Phases 0-7 - foundation, auth/RBAC, vehicles, drivers, trips (with
-  transactional dispatch + race guard), maintenance, fuel/expense/operational-cost, and
-  dashboard KPIs. UI realigned to the design mockup (sidebar layout). All verified
-  against the live DB.
-- **Remaining:** Phases 8-10
+- **Overall completion:** ~82% (Phases 0-8 done)
+- **Current phase:** Phase 8 complete, next: Phase 9 (bonus) / Phase 10 (hardening & demo)
+- **Completed:** Phases 0-8 - foundation, auth/RBAC, vehicles, drivers, trips (with
+  transactional dispatch + race guard), maintenance, fuel/expense/operational-cost,
+  dashboard KPIs, and reports/analytics (fuel efficiency, utilization, operational cost,
+  ROI, CSV export). UI realigned to the design mockup. All verified against the live DB.
+  **All 8 mandatory deliverables are now implemented.**
+- **Remaining:** Phase 9 (bonus features), Phase 10 (hardening & demo)
 - **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
   SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
   `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
@@ -55,7 +56,7 @@
 | 5 | Maintenance workflow | 100% | ✅ Done (In-Shop/close workflow + 18-D verified) |
 | 6 | Fuel & Expense | 100% | ✅ Done (CRUD + operational cost, no double count) |
 | 7 | Dashboard KPIs | 100% | ✅ Done (7 KPIs + filters + recent trips + legend) |
-| 8 | Reports & Analytics | 0% | Not started |
+| 8 | Reports & Analytics | 100% | ✅ Done (4 metrics + ROI + CSV export verified) |
 | 9 | Bonus features | 0% | Not started |
 | 10 | Hardening & Demo | 0% | Not started |
 
@@ -480,33 +481,33 @@
 
 ---
 
-## Phase 8 — Reports & Analytics
+## Phase 8 — Reports & Analytics ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — reuses fuel/maintenance/trip/vehicle aggregates (no new tables)
+- [x] Backend — analytics service (groupBy aggregates, no N+1)
+- [x] Validation — n/a (read-only report)
+- [x] APIs — GET /api/analytics + /api/analytics/export (CSV), RBAC-gated
+- [x] UI — analytics page: KPI cards, ROI formula, monthly revenue chart, top costliest, per-vehicle table
+- [x] Testing — all four formulas + CSV export verified against live data
+- [x] Edge Cases — divide-by-zero → N/A
+- [x] Documentation — synced
 
-- [x] Resolve Revenue field for ROI (§18-F) — **decided: add trips.revenue, capture on complete (Option A, approved)**
-- [ ] Fuel Efficiency = Distance/Fuel (§14) + N/A guard when fuel=0
-- [ ] Fleet Utilization report
-- [ ] Operational Cost report (Fuel+Maintenance, no double count)
-- [ ] Vehicle ROI = (Revenue−(Maintenance+Fuel))/Acquisition Cost + N/A when cost=0
-- [ ] `GET /reports/fuel-efficiency`
-- [ ] `GET /reports/utilization`
-- [ ] `GET /reports/operational-cost`
-- [ ] `GET /reports/roi`
-- [ ] `GET /reports/export?format=csv` (mandatory)
-- [ ] SQL-aggregate computation (no app-side loops, §17)
-- [ ] UI: reports page (tables + filters)
-- [ ] UI: export CSV button
-- [ ] Date-range / vehicle filters
-- [ ] Edge: no-data → N/A, empty CSV with headers
-- [ ] Tests: each formula incl. divide-by-zero
+- [x] Resolve Revenue field for ROI (§18-F) — decided + implemented: trips.revenue captured on complete
+- [x] Fuel Efficiency = Distance/Fuel (§14) + N/A guard when fuel=0 — verified 1.76 km/l, N/A for no-fuel
+- [x] Fleet Utilization report — verified 25%
+- [x] Operational Cost report (Fuel+Maintenance, no double count, §18-E) — verified 12600
+- [x] Vehicle ROI = (Revenue−(Maintenance+Fuel))/Acquisition Cost + N/A when cost=0 — verified per vehicle
+- [x] Consolidated into `GET /api/analytics` (summary + per-vehicle: fuel efficiency,
+      utilization, operational cost, ROI) — one report endpoint vs four separate; same data
+- [x] `GET /api/analytics/export?format=csv` (mandatory CSV) — verified headers + attachment
+- [x] SQL-aggregate computation via groupBy + count merged app-side (no N+1, §17)
+- [x] UI: analytics page (KPI cards + per-vehicle table + monthly revenue chart + top costliest)
+- [x] UI: export CSV button
+- [ ] Date-range filter — deferred (report is all-time; add a range picker in a later pass)
+- [x] Edge: no-data → N/A (guarded), CSV always includes the header row
+- [x] Tests: each formula incl. divide-by-zero — verified
+- [x] Mockup screen 7 matched: Export CSV, 4 KPI cards, ROI formula, Monthly Revenue, Top Costliest Vehicles
+- [ ] PDF export — bonus, not implemented (CSV is the mandatory export)
 
 ---
 

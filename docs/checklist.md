@@ -11,11 +11,12 @@
 
 # Overall Progress
 
-- **Overall completion:** ~27% (Phases 0–2 done)
-- **Current phase:** Phase 2 complete → next: Phase 3 (Driver Management)
-- **Completed:** Phase 0 (foundation) + Phase 1 (auth/RBAC/users) + Phase 2 (vehicle
-  registry CRUD w/ DB-level constraints) — build green, verified against the live DB.
-- **Remaining:** Phases 3–10
+- **Overall completion:** ~36% (Phases 0-3 done)
+- **Current phase:** Phase 3 complete, next: Phase 4 (Trip Management)
+- **Completed:** Phase 0 (foundation), Phase 1 (auth/RBAC/users), Phase 2 (vehicle
+  registry), Phase 3 (driver management) - all with DB-level constraints, build green,
+  verified against the live DB.
+- **Remaining:** Phases 4-10
 - **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
   SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
   `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
@@ -48,7 +49,7 @@
 | 0 | Foundation | 100% | ✅ Done (DB live on VPS via tunnel) |
 | 1 | Auth & RBAC & Users/Roles | 100% | ✅ Done (verified dev + prod) |
 | 2 | Vehicle Registry | 100% | ✅ Done (CRUD + DB CHECKs + RBAC verified) |
-| 3 | Driver Management | 0% | Not started |
+| 3 | Driver Management | 100% | ✅ Done (CRUD + status machine + eligibility verified) |
 | 4 | Trip Management + transitions | 0% | Not started |
 | 5 | Maintenance workflow | 0% | Not started |
 | 6 | Fuel & Expense | 0% | Not started |
@@ -227,62 +228,67 @@
 
 ---
 
-## Phase 3 — Driver Management (CRUD)
+## Phase 3 — Driver Management (CRUD) ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — `drivers` migrated with enum, indexes, CHECK constraints, soft delete
+- [x] Backend — driver service/repository, layered
+- [x] Validation — zod schemas (FE+BE) + DB CHECK backstop
+- [x] APIs — full CRUD + available pool + status actions + filters/search/pagination
+- [x] UI — list w/ license badges, form, detail w/ lifecycle actions, all states
+- [x] Testing — API smoke-tested (CRUD, eligibility, status machine, RBAC, DB backstop)
+- [x] Edge Cases — expires-today, suspended-ineligible, out-of-range, dup license, on-trip
+- [x] Documentation — synced
 
 **Database / Model**
-- [ ] `drivers` table + migration
-- [ ] Fields: name, license_number, license_category, license_expiry_date, contact_number, safety_score, status, user_id 🟨, audit
-- [ ] UNIQUE(license_number) 🟨
-- [ ] CHECK safety_score 0–100
-- [ ] Status enum (Available/On Trip/Off Duty/Suspended)
-- [ ] Indexes: status, license_expiry_date, license_number
-- [ ] Model
+- [x] `drivers` table + migration
+- [x] Fields: name, license_number, license_category, license_expiry_date, contact_number, safety_score, status, user_id 🟨, deleted_at, audit
+- [x] UNIQUE(license_number) + normalized-form CHECK 🟨 (case/space-insensitive)
+- [x] CHECK safety_score 0-100 (raw SQL)
+- [x] CHECK license_category in allowed set + contact non-empty (raw SQL)
+- [x] Status enum DriverStatus (Available/On Trip/Off Duty/Suspended)
+- [x] Indexes: status, license_expiry_date, license_number
+- [x] Model (Prisma) + optional User.driver 1:1 link (§18-B)
 
 **Validation**
-- [ ] Valid license expiry date
-- [ ] Contact number format
-- [ ] Safety score 0–100 (R14)
-- [ ] Unique license number (R17 🟨)
-- [ ] Status transition validation (§7.2)
+- [x] Valid license expiry date (YYYY-MM-DD)
+- [x] Contact number format (lenient phone regex + DB non-empty)
+- [x] Safety score 0-100 (R14) - zod + DB CHECK
+- [x] Unique license number (R17 🟨) - verified case-insensitive 409
+- [x] Status transition validation (§7.2) - central transition map in service
 
 **APIs**
-- [ ] `GET /drivers` (list)
-- [ ] `POST /drivers` (create)
-- [ ] `GET /drivers/:id` (detail)
-- [ ] `PUT /drivers/:id` (update)
-- [ ] `DELETE /drivers/:id` (soft delete/deactivate)
-- [ ] `GET /drivers/available` (eligible: Available & !expired & !Suspended)
-- [ ] `POST /drivers/:id/suspend`
-- [ ] `POST /drivers/:id/reinstate`
-- [ ] Search / filters / sort / pagination
+- [x] `GET /drivers` (list)
+- [x] `POST /drivers` (create)
+- [x] `GET /drivers/:id` (detail)
+- [x] `PUT /drivers/:id` (update)
+- [x] `DELETE /drivers/:id` (soft delete/deactivate) - verified 204 then 404
+- [x] `GET /drivers/available` (eligible: Available & !expired & !deleted, R3) - verified
+- [x] `POST /drivers/:id/suspend`
+- [x] `POST /drivers/:id/reinstate` (only from Suspended - verified 422 otherwise)
+- [x] `POST /drivers/:id/duty` (Available <-> Off Duty clock in/out, §7.2)
+- [x] Search / filters (status/category/eligible) / sort / pagination
+- [x] RBAC verified: Safety Officer create 201; Driver 403; Fleet Manager 403
 
 **UI**
-- [ ] Driver list table + license badge
-- [ ] Search + filters
-- [ ] Create / Edit forms
-- [ ] Driver detail + trip history
-- [ ] Suspend / Reinstate dialogs
-- [ ] Empty / loading / error states
+- [x] Driver list table + license badge (expired/valid)
+- [x] Search + status/category/eligible filters
+- [x] Create / Edit forms (async license uniqueness check)
+- [x] Driver detail (trip history arrives with Phase 4)
+- [x] Suspend / Reinstate / Duty / Deactivate actions (with confirm)
+- [x] Empty / loading / error states
 
 **Edge cases (§15)**
-- [ ] License expires today → eligible (inclusive, §18-H)
-- [ ] Suspended driver ineligible (R3)
-- [ ] Safety score out of range rejected
-- [ ] Duplicate license rejected
-- [ ] Suspend an On-Trip driver blocked (§7.2)
+- [x] License expires today → eligible (inclusive, §18-H) - verified
+- [x] Suspended driver ineligible (R3) - verified excluded from pool
+- [x] Safety score out of range rejected (API 400 + DB CHECK) - verified
+- [x] Duplicate license (case/space) rejected - verified 409
+- [x] Suspend an On-Trip driver blocked (§7.2) - guard in service (exercised once trips exist)
 
 **Testing**
-- [ ] CRUD tests
-- [ ] Eligibility filter tests (expired/suspended/on-trip excluded)
+- [x] CRUD smoke tests - verified
+- [x] Eligibility filter tests (expired/suspended excluded from available pool) - verified
+- [x] DB CHECK backstop (safety range / category / normalized license) - verified
+- [ ] Automated unit/integration suite - deferred (manual verification done)
 
 ---
 

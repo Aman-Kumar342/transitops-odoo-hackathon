@@ -78,9 +78,42 @@ model User {
   role         Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
   isActive     Boolean   @default(true) @map("is_active")
   lastLoginAt  DateTime? @map("last_login_at")
+  driver       Driver? // optional 1:1 link (§18-B) — a driver may (but need not) have a login
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
   @@index([roleId])
   @@map("users")
+}
+
+/// Driver lifecycle states (problem.md §3.4, §7.2). Closed set.
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
+
+/// Driver / operator profiles (problem.md §4.4, §6.4, §12).
+/// DB-level guarantees added via raw SQL in the migration (safety_score range,
+/// license_category set, normalized-uppercase license_number) so invalid data is
+/// rejected even if the API is bypassed. Soft-deleted via `deleted_at` (§18-I).
+model Driver {
+  id                Int          @id @default(autoincrement())
+  name              String
+  licenseNumber     String       @unique @map("license_number")
+  licenseCategory   String       @map("license_category")
+  licenseExpiryDate DateTime     @map("license_expiry_date") @db.Date
+  contactNumber     String       @map("contact_number")
+  safetyScore       Int          @default(100) @map("safety_score")
+  status            DriverStatus @default(AVAILABLE)
+  userId            Int?         @unique @map("user_id")
+  user              User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  deletedAt         DateTime?    @map("deleted_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([licenseExpiryDate])
+  @@map("drivers")
 }

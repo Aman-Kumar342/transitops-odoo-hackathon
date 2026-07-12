@@ -16,6 +16,7 @@ interface Me {
 const NAV: { href: string; label: string }[] = [
   { href: "/", label: "Dashboard" },
   { href: "/vehicles", label: "Vehicles" },
+  { href: "/drivers", label: "Drivers" },
   { href: "/settings", label: "Settings" },
 ];
 

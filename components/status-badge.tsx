@@ -17,6 +17,9 @@ const COLORS: Record<string, { bg: string; fg: string }> = {
   DISPATCHED: { bg: "rgba(43,108,176,0.14)", fg: "var(--status-ontrip)" },
   COMPLETED: { bg: "rgba(26,143,92,0.14)", fg: "var(--status-available)" },
   CANCELLED: { bg: "rgba(192,57,43,0.12)", fg: "var(--color-danger)" },
+  // Maintenance
+  OPEN: { bg: "rgba(183,121,31,0.16)", fg: "var(--status-inshop)" },
+  CLOSED: { bg: "rgba(26,143,92,0.14)", fg: "var(--status-available)" },
 };
 
 const FALLBACK = { bg: "var(--color-surface-2)", fg: "var(--color-text-muted)" };

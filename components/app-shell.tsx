@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { apiFetch } from "@/lib/client/api";
+import { can, type Resource } from "@/lib/auth/rbac";
 
 interface Me {
   id: number;
@@ -12,12 +13,14 @@ interface Me {
   role: { id: number; name: string };
 }
 
-// Nav grows as modules land in later phases.
-const NAV: { href: string; label: string }[] = [
+// Nav grows as modules land in later phases. `resource` gates the link by RBAC read
+// permission (undefined = always visible).
+const NAV: { href: string; label: string; resource?: Resource }[] = [
   { href: "/", label: "Dashboard" },
-  { href: "/vehicles", label: "Vehicles" },
-  { href: "/drivers", label: "Drivers" },
-  { href: "/trips", label: "Trips" },
+  { href: "/vehicles", label: "Vehicles", resource: "vehicles" },
+  { href: "/drivers", label: "Drivers", resource: "drivers" },
+  { href: "/trips", label: "Trips", resource: "trips" },
+  { href: "/maintenance", label: "Maintenance", resource: "maintenance" },
   { href: "/settings", label: "Settings" },
 ];
 
@@ -71,7 +74,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             TransitOps
           </Link>
           <nav style={{ display: "flex", gap: "var(--space-3)", flex: 1 }}>
-            {NAV.map((item) => {
+            {NAV.filter(
+              (item) => !item.resource || !me || can(me.role.name, item.resource, "read"),
+            ).map((item) => {
               const active =
                 item.href === "/"
                   ? pathname === "/"

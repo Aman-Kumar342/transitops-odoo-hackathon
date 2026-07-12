@@ -2,6 +2,8 @@
  * Driver domain constants — single source of truth shared by validation, services,
  * and UI. (problem.md §4.4, §6.4, §7.2)
  */
+import { todayUtc } from "./date";
+export { todayUtc } from "./date";
 
 /**
  * License categories. PDF requires "License Category" and the validation matrix says
@@ -63,14 +65,6 @@ export function canManuallyTransition(
 /** Normalizes a license number for case/whitespace-insensitive uniqueness (R17). */
 export function normalizeLicense(value: string): string {
   return value.trim().replace(/\s+/g, " ").toUpperCase();
-}
-
-/** UTC date at 00:00 for "today" — the boundary for license-expiry checks (§18-M). */
-export function todayUtc(): Date {
-  const now = new Date();
-  return new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
 }
 
 /**

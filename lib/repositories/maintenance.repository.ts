@@ -30,6 +30,11 @@ export const maintenanceRepository = {
   update(id: number, data: Prisma.MaintenanceLogUpdateInput) {
     return prisma.maintenanceLog.update({ where: { id }, data, include: withVehicle });
   },
+  /** Sum of maintenance cost for a vehicle - the single source of truth for the
+   *  maintenance component of operational cost (§18-E). */
+  aggregateCostByVehicle(vehicleId: number) {
+    return prisma.maintenanceLog.aggregate({ where: { vehicleId }, _sum: { cost: true } });
+  },
 };
 
 export type MaintenanceWithVehicle = NonNullable<

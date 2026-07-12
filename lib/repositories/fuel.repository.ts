@@ -34,6 +34,10 @@ export const fuelRepository = {
   aggregateByVehicle(vehicleId: number) {
     return prisma.fuelLog.aggregate({ where: { vehicleId }, _sum: { cost: true, liters: true } });
   },
+  /** Fuel cost + liters grouped by vehicle (for fleet analytics, no N+1). */
+  groupByVehicle() {
+    return prisma.fuelLog.groupBy({ by: ["vehicleId"], _sum: { cost: true, liters: true } });
+  },
 };
 
 export type FuelLogWithVehicle = NonNullable<

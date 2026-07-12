@@ -38,6 +38,21 @@ export const tripRepository = {
   update(id: number, data: Prisma.TripUpdateInput) {
     return prisma.trip.update({ where: { id }, data, include: withParties });
   },
+  /** Completed-trip revenue + distance grouped by vehicle (for ROI / efficiency). */
+  groupCompletedByVehicle() {
+    return prisma.trip.groupBy({
+      by: ["vehicleId"],
+      where: { status: "COMPLETED" },
+      _sum: { revenue: true, plannedDistance: true },
+    });
+  },
+  /** Completed trips' revenue + completion date (for the monthly-revenue chart). */
+  completedRevenueSeries() {
+    return prisma.trip.findMany({
+      where: { status: "COMPLETED", completedAt: { not: null }, revenue: { not: null } },
+      select: { revenue: true, completedAt: true },
+    });
+  },
 };
 
 export type TripWithParties = NonNullable<

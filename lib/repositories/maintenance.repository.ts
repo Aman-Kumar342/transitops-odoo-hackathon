@@ -35,6 +35,10 @@ export const maintenanceRepository = {
   aggregateCostByVehicle(vehicleId: number) {
     return prisma.maintenanceLog.aggregate({ where: { vehicleId }, _sum: { cost: true } });
   },
+  /** Maintenance cost grouped by vehicle (for fleet analytics, no N+1). */
+  groupCostByVehicle() {
+    return prisma.maintenanceLog.groupBy({ by: ["vehicleId"], _sum: { cost: true } });
+  },
 };
 
 export type MaintenanceWithVehicle = NonNullable<

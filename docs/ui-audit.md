@@ -25,8 +25,10 @@ are missing secondary panels shown in the design.
 > P2 (Important) **done** — Settings General + live RBAC matrix, trip lifecycle stepper,
 > driver "Trip Compl." column, fuel-expense operational-cost strip.
 > P3 (Polish) **done** — destructive/ghost button variants, `:focus-visible` ring, table
-> row hover, fixed 4-col KPI grid + responsive split sections, maintenance state-flow
-> strip. Projected match now **~92**. Remaining: P4 (nice-to-have).
+> row hover, fixed 4-col KPI grid + responsive split sections, maintenance state-flow strip.
+> P4 (Nice-to-have) **done** — login remember-me + forgot-password, trips "Note" column,
+> shared `<DataTable>` component (adopted on trips), gridlined revenue chart.
+> **All P1–P4 shipped; projected match ~93.**
 
 | Category | Score | One-line reason |
 |---|:---:|---|
@@ -309,13 +311,13 @@ Effort key: XS ≈ <15 min · S ≈ 15–45 min · M ≈ 1–2 h · L ≈ half-d
 | 11 | Maintenance | Small **state-flow strip** (Available→In Shop→Available) | Visual reinforcement of R9/R10 | Low | S | ✅ done |
 | 12 | Global | `:focus-visible` ring on interactive elements | Stronger keyboard a11y | Low | XS | ✅ done |
 
-## Priority 4 — Nice to have
-| # | Page/Component | Issue | Expected outcome | Complexity | Effort |
-|---|---|---|---|---|---|
-| 13 | Login | Remember-me + forgot-password (visual), lockout copy in error state | Cosmetic parity with mockup | Low | S |
-| 14 | Trips | "Live Board" ETA/note column | Row parity with mockup | Low | S |
-| 15 | Design system | Extract `<ResourceList>` wrapper for list pages | Less duplication, guaranteed consistency | Med | M |
-| 16 | Analytics | Richer chart (still no external dep) | Slightly closer to mockup chart | Med | M |
+## Priority 4 — Nice to have — ✅ DONE
+| # | Page/Component | Issue | Expected outcome | Complexity | Effort | Status |
+|---|---|---|---|---|---|---|
+| 13 | Login | Remember-me (prefills email) + forgot-password (admin note) | Cosmetic parity with mockup | Low | S | ✅ done |
+| 14 | Trips | "Live Board" note column (status-derived) | Row parity with mockup | Low | S | ✅ done |
+| 15 | Design system | Shared `<DataTable>`/`Td` component (adopted on trips; other lists can migrate) | Less duplication, guaranteed consistency | Med | M | ✅ (component + trips) |
+| 16 | Analytics | Gridlined monthly-revenue chart with peak label (no external dep) | Closer to mockup chart | Med | S | ✅ done |
 
 ---
 

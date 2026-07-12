@@ -15,11 +15,16 @@
 
 # 1. Overall Design Match Score
 
-## **Overall: 74 / 100**
+## **Overall: 74 / 100** → **~85 after P1 (in progress)**
 
 Functionally complete and internally consistent, but two high-impact brand/structure
 choices diverge from the mockup (accent color and sidebar treatment), and a few screens
 are missing secondary panels shown in the design.
+
+> **Fix progress:** P1 (Critical) is **done** — blue accent, dark sidebar, and split-panel
+> login are implemented and shipped. This lifts Visual Fidelity ~60 → ~85 and Layout
+> ~72 → ~85. Remaining: P2 (Settings General + RBAC matrix, trip stepper, driver
+> trip-compl column, fuel-expense total), P3 (polish), P4 (nice-to-have).
 
 | Category | Score | One-line reason |
 |---|:---:|---|
@@ -278,12 +283,12 @@ Legend: ✅ matches · ⚠ slight deviation · ❌ missing/wrong.
 
 Effort key: XS ≈ <15 min · S ≈ 15–45 min · M ≈ 1–2 h · L ≈ half-day.
 
-## Priority 1 — Critical (brand fidelity; do these first)
-| # | Page/Component | Issue | Expected outcome | Complexity | Effort |
-|---|---|---|---|---|---|
-| 1 | Global (`globals.css`) | Primary accent purple → **blue `#1971c2`** (+ hover, dark-mode variant) | App-wide color matches the mockup; buttons/nav/links/chart all update from one token | Trivial | XS |
-| 2 | `AppShell` + `globals.css` | **Dark sidebar** (`#212529`, ~190–224px, light text, blue active item) | Sidebar reads like the mockup's product chrome | Low | S |
-| 3 | `app/login` | **Two-panel split login** (dark brand panel + form card) | First-impression screen matches the design | Medium | M |
+## Priority 1 — Critical (brand fidelity; do these first) — ✅ DONE
+| # | Page/Component | Issue | Expected outcome | Complexity | Effort | Status |
+|---|---|---|---|---|---|---|
+| 1 | Global (`globals.css`) | Primary accent purple → **blue `#1971c2`** (+ hover, dark-mode variant) | App-wide color matches the mockup; buttons/nav/links/chart all update from one token | Trivial | XS | ✅ done |
+| 2 | `AppShell` + `globals.css` | **Dark sidebar** (`#212529`, ~190–224px, light text, blue active item) | Sidebar reads like the mockup's product chrome | Low | S | ✅ done |
+| 3 | `app/login` | **Two-panel split login** (dark brand panel + form card) | First-impression screen matches the design | Medium | M | ✅ done |
 
 ## Priority 2 — Important (missing components judges will look for)
 | # | Page/Component | Issue | Expected outcome | Complexity | Effort |

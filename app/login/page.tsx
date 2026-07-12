@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { loginSchema } from "@/lib/validation/auth";
 import { apiFetch, ApiError } from "@/lib/client/api";
+
+const REMEMBER_KEY = "transitops.rememberEmail";
 
 /**
  * Login page. Client-side validation is UX only; the server is authoritative.
@@ -12,9 +14,24 @@ import { apiFetch, ApiError } from "@/lib/client/api";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Prefill a remembered email.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(REMEMBER_KEY);
+      if (saved) {
+        setEmail(saved);
+        setRemember(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +55,12 @@ export default function LoginPage() {
         method: "POST",
         body: JSON.stringify(parsed.data),
       });
+      try {
+        if (remember) localStorage.setItem(REMEMBER_KEY, parsed.data.email);
+        else localStorage.removeItem(REMEMBER_KEY);
+      } catch {
+        /* ignore */
+      }
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
       window.location.href = next && next.startsWith("/") ? next : "/";
@@ -126,6 +149,25 @@ export default function LoginPage() {
             >
               {formError}
             </div>
+          )}
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-4)", fontSize: 14 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-muted)" }}>
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+              Remember me
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowForgot((v) => !v)}
+              style={{ background: "none", border: "none", padding: 0, color: "var(--color-primary)", cursor: "pointer", font: "inherit" }}
+            >
+              Forgot password?
+            </button>
+          </div>
+          {showForgot && (
+            <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 0, marginBottom: "var(--space-4)" }}>
+              Password resets are handled by your administrator. Contact them to reset your account.
+            </p>
           )}
 
           <button

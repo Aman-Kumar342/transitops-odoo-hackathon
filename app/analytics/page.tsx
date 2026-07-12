@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
         ) : (
           <>
             {/* KPI cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "var(--space-3)" }}>
+            <div className="stat-grid">
               <Metric label="Fuel Efficiency" value={na(report.summary.fuelEfficiency, " km/l")} />
               <Metric label="Fleet Utilization" value={`${report.summary.fleetUtilization}%`} />
               <Metric label="Operational Cost" value={fmt(report.summary.operationalCost)} />
@@ -61,7 +61,7 @@ export default function AnalyticsPage() {
               per trip on completion (§18-F).
             </p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", gap: "var(--space-4)", marginTop: "var(--space-5)" }}>
+            <div className="split-2" style={{ marginTop: "var(--space-5)" }}>
               {/* Monthly revenue chart */}
               <div className="card">
                 <strong style={{ fontSize: 14 }}>Monthly Revenue (last 6 months)</strong>

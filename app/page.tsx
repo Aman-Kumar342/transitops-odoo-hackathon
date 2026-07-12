@@ -72,7 +72,7 @@ export default function DashboardPage() {
         ) : kpis ? (
           <>
             {/* KPI tiles */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-3)" }}>
+            <div className="stat-grid">
               {tiles.map((t) => (
                 <div key={t.label} className="card" style={{ padding: "var(--space-4)" }}>
                   <div style={{ fontSize: 11, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--color-text-muted)" }}>{t.label}</div>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent trips + status legend */}
-            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", gap: "var(--space-4)", marginTop: "var(--space-5)" }}>
+            <div className="split-2" style={{ marginTop: "var(--space-5)" }}>
               <div className="card" style={{ padding: 0, overflow: "hidden" }}>
                 <div style={{ padding: "var(--space-3) var(--space-4)", borderBottom: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <strong style={{ fontSize: 14 }}>Recent Trips</strong>

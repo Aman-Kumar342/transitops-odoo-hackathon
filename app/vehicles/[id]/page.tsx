@@ -163,7 +163,7 @@ export default function VehicleDetailPage() {
                   <p style={{ color: "var(--color-danger)", fontSize: 14 }}>{actionError}</p>
                 )}
                 <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  <button className="btn btn--primary" onClick={retire} disabled={retiring}>
+                  <button className="btn btn--danger" onClick={retire} disabled={retiring}>
                     {retiring ? "Retiring…" : "Yes, retire"}
                   </button>
                   <button className="btn" onClick={() => setConfirmRetire(false)} disabled={retiring}>

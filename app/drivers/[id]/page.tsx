@@ -150,7 +150,7 @@ export default function DriverDetailPage() {
                 </p>
                 {actionError && <p style={{ color: "var(--color-danger)", fontSize: 14 }}>{actionError}</p>}
                 <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  <button className="btn btn--primary" onClick={deactivate} disabled={busy}>
+                  <button className="btn btn--danger" onClick={deactivate} disabled={busy}>
                     {busy ? "Deactivating…" : "Yes, deactivate"}
                   </button>
                   <button className="btn" onClick={() => setConfirmDeactivate(false)} disabled={busy}>Cancel</button>

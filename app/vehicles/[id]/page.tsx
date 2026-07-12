@@ -17,6 +17,7 @@ export default function VehicleDetailPage() {
 
   const [role, setRole] = useState<string | null>(null);
   const [vehicle, setVehicle] = useState<VehicleDTO | null>(null);
+  const [cost, setCost] = useState<{ fuelCost: number; maintenanceCost: number; operationalCost: number; otherExpenses: number; fuelLiters: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [confirmRetire, setConfirmRetire] = useState(false);
@@ -44,6 +45,10 @@ export default function VehicleDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    apiFetch<typeof cost>(`/api/vehicles/${id}/operational-cost`).then(setCost).catch(() => {});
+  }, [id]);
 
   async function retire() {
     setRetiring(true);
@@ -113,6 +118,21 @@ export default function VehicleDetailPage() {
               </dl>
             </div>
 
+            {cost && (
+              <div className="card" style={{ marginTop: "var(--space-3)" }}>
+                <h2 style={{ fontSize: 14, marginTop: 0, color: "var(--color-text-muted)" }}>
+                  Operational cost (Fuel + Maintenance)
+                </h2>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "var(--space-3)" }}>
+                  <Stat label="Operational" value={cost.operationalCost} emphasis />
+                  <Stat label="Fuel" value={cost.fuelCost} />
+                  <Stat label="Maintenance" value={cost.maintenanceCost} />
+                  <Stat label="Other expenses" value={cost.otherExpenses} muted />
+                  <Stat label="Fuel (L)" value={cost.fuelLiters} muted />
+                </div>
+              </div>
+            )}
+
             {(canUpdate || canDelete) && !isRetired && (
               <div style={{ marginTop: "var(--space-4)", display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
                 {canUpdate && (
@@ -170,5 +190,16 @@ function Row({ label, value }: { label: string; value: string }) {
       <dt style={{ color: "var(--color-text-muted)", fontSize: 14 }}>{label}</dt>
       <dd style={{ margin: 0 }}>{value}</dd>
     </>
+  );
+}
+
+function Stat({ label, value, emphasis, muted }: { label: string; value: number; emphasis?: boolean; muted?: boolean }) {
+  return (
+    <div>
+      <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{label}</div>
+      <div style={{ fontSize: emphasis ? 22 : 18, fontWeight: emphasis ? 700 : 600, color: muted ? "var(--color-text-muted)" : "var(--color-text)" }}>
+        {value.toLocaleString()}
+      </div>
+    </div>
   );
 }

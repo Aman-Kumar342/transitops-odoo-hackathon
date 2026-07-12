@@ -21,6 +21,8 @@ const NAV: { href: string; label: string; resource?: Resource }[] = [
   { href: "/drivers", label: "Drivers", resource: "drivers" },
   { href: "/trips", label: "Trips", resource: "trips" },
   { href: "/maintenance", label: "Maintenance", resource: "maintenance" },
+  { href: "/fuel", label: "Fuel", resource: "fuel" },
+  { href: "/expenses", label: "Expenses", resource: "expenses" },
   { href: "/settings", label: "Settings" },
 ];
 

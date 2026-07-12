@@ -1,0 +1,54 @@
+// TransitOps — Prisma schema
+// Source of truth for the data model is docs/problem.md (§6, §12).
+// Models are added phase-by-phase per docs/checklist.md:
+//   Phase 1 → Role, User            (this file)
+//   Phase 2 → Vehicle
+//   Phase 3 → Driver
+//   Phase 4 → Trip (incl. `revenue` — §18-F approved assumption)
+//   Phase 5 → MaintenanceLog
+//   Phase 6 → FuelLog, Expense
+//
+// DB policy (docs/checklist.md, problem.md §12): Prisma Migrate is primary; use raw
+// SQL inside migrations for anything Prisma cannot express (CHECK constraints, partial
+// unique indexes, etc.). The database must reject invalid data even if the API is
+// bypassed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+/// RBAC roles. Stored as data (problem.md §3, §6) so the set is extensible; the five
+/// seeded roles are Admin, Fleet Manager, Driver, Safety Officer, Financial Analyst.
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  users       User[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+/// Authenticated accounts. Password is always stored hashed (bcrypt) — never plaintext.
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  roleId       Int       @map("role_id")
+  role         Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@index([roleId])
+  @@map("users")
+}

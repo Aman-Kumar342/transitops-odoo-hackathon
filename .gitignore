@@ -1,2 +1,45 @@
-# Local team notes and guidelines (not shared in the repo)
+# Local team notes (not shared in the repo)
 private/
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts.bak
+
+# Production build
+/build
+
+# Environment / secrets — NEVER commit real values
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Prisma
+/prisma/*.db
+/prisma/*.db-journal
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+/coverage
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# TypeScript
+*.tsbuildinfo

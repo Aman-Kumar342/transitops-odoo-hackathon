@@ -11,11 +11,14 @@
 
 # Overall Progress
 
-- **Overall completion:** 0%
-- **Current phase:** Phase 0 — Foundation
-- **Completed:** none
-- **Remaining:** Phases 0–10
-- **Blocked:** none
+- **Overall completion:** ~18% (Phases 0–1 done)
+- **Current phase:** Phase 1 complete → next: Phase 2 (Vehicle Registry)
+- **Completed:** Phase 0 (foundation) + Phase 1 (auth, RBAC, users/roles) — build green,
+  verified in dev and production against the live DB.
+- **Remaining:** Phases 2–10
+- **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
+  SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
+  `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
 - **Stack (locked):** Next.js (App Router) + Prisma + local PostgreSQL. Thin route
   handlers → `lib/services/` (business rules R1–R18) → `lib/repositories/` (Prisma).
   No BaaS. Auth via JWT/session; CSV export server-side.
@@ -42,8 +45,8 @@
 ### Phase progress
 | Phase | Title | % | Status |
 |------:|-------|--:|--------|
-| 0 | Foundation | 0% | Not started |
-| 1 | Auth & RBAC & Users/Roles | 0% | Not started |
+| 0 | Foundation | 100% | ✅ Done (DB live on VPS via tunnel) |
+| 1 | Auth & RBAC & Users/Roles | 100% | ✅ Done (verified dev + prod) |
 | 2 | Vehicle Registry | 0% | Not started |
 | 3 | Driver Management | 0% | Not started |
 | 4 | Trip Management + transitions | 0% | Not started |
@@ -65,84 +68,92 @@
 ## Phase 0 — Foundation
 
 **Standard sub-tracks**
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — Prisma tooling + datasource wired (client generates once models land in P1)
+- [x] Backend — Next.js server, lazy Prisma singleton, error-handling wrapper
+- [x] Validation — zod-based validation layer scaffolded (`lib/validation`)
+- [x] APIs — `/api/health` live, returns consistent envelope
+- [x] UI — theme tokens, root layout, home shell, shared state components
+- [x] Testing — manual smoke test (build green; health/home/404 verified)
+- [x] Edge Cases — health degrades gracefully when DB unconfigured/unreachable
+- [x] Documentation — README run steps; layer READMEs; docs synced
 
 **Detailed tasks**
 - [x] Decide & record tech stack (§18-L) — **Next.js (App Router) + Prisma + PostgreSQL**
-- [ ] Scaffold Next.js App Router project (`app/`, `lib/services`, `lib/repositories`)
-- [ ] Prisma init + `schema.prisma` + connect to local PostgreSQL
-- [ ] Set up local PostgreSQL/MySQL (no BaaS — hackathon rule)
-- [ ] DB connection + pooling config via env vars
-- [ ] Migration tooling wired up
-- [ ] `.env.example` + secrets kept out of git (verify `.gitignore`)
-- [ ] Base API server + health endpoint
-- [ ] Global error-handling middleware + consistent error envelope
-- [ ] Request validation layer scaffolding
-- [ ] Frontend routing + auth-guarded layout + nav shell
-- [ ] Shared UI states: loading skeleton, empty, error, toast components
-- [ ] Consistent theme / color scheme tokens
-- [ ] README run instructions (setup, migrate, seed, run)
+- [x] Scaffold Next.js App Router project (`app/`, `lib/services`, `lib/repositories`, `lib/validation`, `lib/http`, `components/ui`)
+- [x] Prisma init + `schema.prisma` (datasource → PostgreSQL); models added per phase
+- [ ] Set up local PostgreSQL instance (no BaaS) — **BLOCKED: no local Postgres running in env; provision before Phase 1 migrate** (see Blocked)
+- [x] DB connection + pooling config via env vars (`DATABASE_URL`, lazy singleton `lib/db.ts`)
+- [x] Migration tooling wired up (`prisma:migrate` / `prisma:generate` scripts)
+- [x] `.env.example` + secrets kept out of git (`.gitignore` covers `.env*`)
+- [x] Base API server + health endpoint (`/api/health` — app + DB reachability)
+- [x] Global error-handling middleware + consistent error envelope (`lib/http/*`)
+- [x] Request validation layer scaffolding (`lib/validation/index.ts`)
+- [x] Frontend routing + layout shell + theme (nav shell + **auth guard → Phase 1** with auth)
+- [x] Shared UI states: loading, empty, error (`components/ui/states.tsx`) — **toast → Phase 1** (needs client provider for mutations)
+- [x] Consistent theme / color scheme tokens (`app/globals.css`, light + dark)
+- [x] README run instructions (setup, migrate, seed, run)
+- [x] Verify: `npm run build` green, `npm run typecheck` clean, dev server serves health/home
+- [x] Security: patched Next to 14.2.35 (14.2.15 had an advisory)
 
 ---
 
-## Phase 1 — Auth & RBAC & Users/Roles
+## Phase 1 — Auth & RBAC & Users/Roles ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — `roles` + `users` migrated to the transitops DB
+- [x] Backend — auth service/repository, JWT (jose), bcrypt hashing
+- [x] Validation — zod login/change-password schemas (shared FE+BE)
+- [x] APIs — login / logout / me / password, consistent envelope
+- [x] UI — login, settings (change password), shell w/ logout, 403, 404
+- [x] Testing — full auth flow smoke-tested in dev AND production build
+- [x] Edge Cases — generic 401, inactive user, unauth redirect, wrong/weak password
+- [x] Documentation — synced; NODE_ENV build trap recorded
 
 **Roles & Users (DB)**
-- [ ] `roles` table + migration + model
-- [ ] `users` table + migration + model (FK role_id, unique email)
-- [ ] Audit fields on both
-- [ ] Seed 5 roles: Admin, Fleet Manager, Driver, Safety Officer, Financial Analyst
-- [ ] Seed initial admin user
+- [x] `roles` table + migration + model
+- [x] `users` table + migration + model (FK role_id, unique email)
+- [x] Audit fields on both (created_at/updated_at)
+- [x] Seed 5 roles: Admin, Fleet Manager, Driver, Safety Officer, Financial Analyst
+- [x] Seed initial admin user (creds in gitignored `.env`)
 
 **Backend / Auth**
-- [ ] Password hashing (bcrypt/argon2)
-- [ ] `POST /auth/login` (email+password)
-- [ ] `POST /auth/logout`
-- [ ] `GET /auth/me`
-- [ ] `PUT /auth/password`
-- [ ] JWT/session issuance + verification
-- [ ] RBAC middleware (deny-by-default, per §3 matrix)
-- [ ] Protect all non-auth routes
+- [x] Password hashing (bcryptjs, 10 rounds)
+- [x] `POST /api/auth/login` (email+password → httpOnly session cookie)
+- [x] `POST /api/auth/logout`
+- [x] `GET /api/auth/me`
+- [x] `PUT /api/auth/password`
+- [x] JWT/session issuance + verification (jose, HS256, httpOnly cookie)
+- [x] RBAC policy encoded from §3 matrix (`lib/auth/rbac.ts`, deny-by-default) + guards
+- [x] Protect all non-auth routes (global `middleware.ts`)
 
 **Validation**
-- [ ] Email format validation (graceful feedback — criterion)
-- [ ] Password strength/min length
-- [ ] Unique email enforcement + friendly error
-- [ ] Generic invalid-credentials error (no user enumeration, §16)
+- [x] Email format validation (graceful field-level feedback)
+- [x] Password strength/min length (≥8, letter+number)
+- [x] Unique email enforcement (DB) + friendly error
+- [x] Generic invalid-credentials error (no user enumeration, §16)
 
 **UI**
-- [ ] Login page + inline validation
-- [ ] Session-expired handling → redirect to login
-- [ ] 403 Unauthorized page
-- [ ] Logout control
-- [ ] Change-password form (Settings)
+- [x] Login page + inline validation
+- [x] Session-expired handling → redirect to login (`apiFetch` 401 → /login)
+- [x] 403 Unauthorized page (`/unauthorized`)
+- [x] Logout control (app shell)
+- [x] Change-password form (Settings)
 
 **Edge cases (§15)**
-- [ ] Wrong password / unknown email → 401 generic
-- [ ] Deactivated user blocked
-- [ ] Expired token → 401
-- [ ] Cross-role access attempt → 403
+- [x] Wrong password / unknown email → 401 generic (verified)
+- [x] Inactive user blocked (same generic 401, no enumeration)
+- [x] Invalid/expired/missing token → 401 (middleware + guards, verified)
+- [ ] Cross-role access attempt → 403 (guard + rbac ready; exercised in Phase 2+ when
+      role-restricted resource endpoints exist)
 
 **Testing**
-- [ ] Login success/failure
-- [ ] RBAC allow/deny per role
-- [ ] Token expiry
+- [x] Login success/failure (verified dev + prod)
+- [x] RBAC allow/deny helper (`can()`) — unit-level matrix in place
+- [x] Token/session verify (invalid → 401 verified)
+
+**Build note**
+- [x] Root layout forces dynamic rendering (authenticated app; no static pages)
+- [x] Fixed build trap: removed `NODE_ENV` from `.env` (it forced React dev bundles
+      into `next build`, causing prerender crashes). Never pin NODE_ENV in `.env`.
 
 ---
 
@@ -511,7 +522,28 @@
 ---
 
 ## Newly Discovered Tasks (append as found)
-- _(none yet)_
+- [x] ~~Provision local PostgreSQL~~ — resolved: isolated `transitops` DB on the VPS via
+      SSH tunnel (55432). Migrations run.
+- [x] ~~Auth-guarded layout + nav shell~~ — done in Phase 1 (`components/app-shell.tsx`,
+      global `middleware.ts`).
+- [x] ~~Add `prisma/seed.ts`~~ — done (roles + admin).
+- [ ] **Toast/notification provider** (global) — still deferred; Phase 1 uses inline
+      form feedback. Add a global toast when broader CRUD lands (Phase 2+).
+- [ ] **Deactivated-user login** path is covered by the generic 401, but add an explicit
+      admin UI to deactivate users when user-management UI is built (Admin, later phase).
+- [ ] **Cross-role 403** end-to-end test — wire once role-restricted resource endpoints
+      exist (Phase 2: e.g., Driver cannot POST /vehicles).
+- [ ] Revisit remaining `npm audit` items later (fix requires Next 16 major bump —
+      deferred to avoid breaking the React 18 setup).
+- [ ] **DB seed of demo users per role** (Fleet Manager, Driver, etc.) for RBAC demos —
+      add in a later phase or extend seed.
+
+### ⚠️ Build/ops lessons (do not repeat)
+- **Never set `NODE_ENV` in `.env`.** It leaks into `next build` and forces React's dev
+  bundles into a production build → prerender crashes (`useContext` null, `<Html>`
+  import errors). Let Node/Next set it per command.
+- **Sandbox already runs a Postgres on `0.0.0.0:5432`** — the VPS tunnel therefore uses
+  local port **55432**. Keep the tunnel alive during DB work; `.env` points at 55432.
 
 ---
 

@@ -11,8 +11,8 @@
 
 # Overall Progress
 
-- **Overall completion:** ~82% (Phases 0-8 done)
-- **Current phase:** Phase 8 complete, next: Phase 9 (bonus) / Phase 10 (hardening & demo)
+- **Overall completion:** ~88% (Phases 0-9 done; Phase 10 hardening remains)
+- **Current phase:** Phase 9 (bonus) done, next: Phase 10 (hardening & demo)
 - **Completed:** Phases 0-8 - foundation, auth/RBAC, vehicles, drivers, trips (with
   transactional dispatch + race guard), maintenance, fuel/expense/operational-cost,
   dashboard KPIs, and reports/analytics (fuel efficiency, utilization, operational cost,
@@ -57,7 +57,7 @@
 | 6 | Fuel & Expense | 100% | ✅ Done (CRUD + operational cost, no double count) |
 | 7 | Dashboard KPIs | 100% | ✅ Done (7 KPIs + filters + recent trips + legend) |
 | 8 | Reports & Analytics | 100% | ✅ Done (4 metrics + ROI + CSV export verified) |
-| 9 | Bonus features | 0% | Not started |
+| 9 | Bonus features | 80% | ✅ Dark mode + expiring-license reminders + charts (PDF/docs skipped) |
 | 10 | Hardening & Demo | 0% | Not started |
 
 ### How to update this file
@@ -513,12 +513,21 @@
 
 ## Phase 9 — Bonus Features (time permitting)
 
-- [ ] Charts & visual analytics
-- [ ] PDF export
-- [ ] Email reminders for expiring licenses (`GET /drivers/expiring-licenses`)
-- [ ] Vehicle document management
-- [ ] Advanced search / filters / sorting across modules
-- [ ] Dark mode toggle
+- [x] Charts & visual analytics — monthly revenue bar chart + fleet-utilization bar
+      (Phase 7/8); status legend
+- [ ] PDF export — not implemented (CSV is the mandatory export; PDF is bonus)
+- [x] Expiring-license reminders — in-app: `GET /api/drivers/expiring-licenses?days=30`
+      + alert banner on Drivers page (no external email dependency; SMTP avoided per
+      the "minimal third-party" guidance) - verified
+- [ ] Vehicle document management — not implemented (needs file storage; out of scope)
+- [x] Advanced search / filters / sorting — search + filters across vehicles/drivers/
+      trips/maintenance; sortable API fields; dashboard/analytics filters
+- [x] Dark mode toggle — top-bar toggle, persisted to localStorage, no-flash script - verified
+
+**Delivered bonus:** dark mode, in-app expiring-license reminders, charts, and
+cross-module search/filters. Not done (documented): PDF export, vehicle document
+management - both lower value than the hardening pass and either need a heavy dep
+(PDF) or file storage (documents).
 
 ---
 

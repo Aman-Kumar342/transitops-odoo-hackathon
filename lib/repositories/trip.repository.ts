@@ -46,6 +46,15 @@ export const tripRepository = {
       _sum: { revenue: true, plannedDistance: true },
     });
   },
+
+  /** Completed-trip count grouped by driver (for the driver "Trip Compl." column). */
+  groupCompletedCountByDriver() {
+    return prisma.trip.groupBy({
+      by: ["driverId"],
+      where: { status: "COMPLETED" },
+      _count: { _all: true },
+    });
+  },
   /** Completed trips' revenue + completion date (for the monthly-revenue chart). */
   completedRevenueSeries() {
     return prisma.trip.findMany({

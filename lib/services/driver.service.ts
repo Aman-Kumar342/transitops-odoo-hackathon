@@ -1,5 +1,6 @@
 import type { Prisma, Driver } from "@prisma/client";
 import { driverRepository } from "@/lib/repositories/driver.repository";
+import { tripRepository } from "@/lib/repositories/trip.repository";
 import {
   ConflictError,
   NotFoundError,
@@ -38,12 +39,13 @@ export interface DriverDTO {
   userId: number | null;
   licenseExpired: boolean;
   eligible: boolean;
+  tripsCompleted: number;
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-function toDTO(d: Driver): DriverDTO {
+function toDTO(d: Driver, tripsCompleted = 0): DriverDTO {
   const status = d.status as DriverStatusValue;
   return {
     id: d.id,
@@ -56,6 +58,7 @@ function toDTO(d: Driver): DriverDTO {
     status,
     statusLabel: DRIVER_STATUS_LABELS[status],
     userId: d.userId,
+    tripsCompleted,
     licenseExpired: isLicenseExpired(d.licenseExpiryDate),
     eligible: isDriverEligible({
       status,
@@ -101,7 +104,7 @@ export const driverService = {
     }
 
     const skip = (query.page - 1) * query.limit;
-    const [items, total] = await Promise.all([
+    const [items, total, completedCounts] = await Promise.all([
       driverRepository.findMany({
         where,
         orderBy: { [query.sort]: query.order },
@@ -109,10 +112,13 @@ export const driverService = {
         take: query.limit,
       }),
       driverRepository.count(where),
+      tripRepository.groupCompletedCountByDriver(),
     ]);
 
+    const countByDriver = new Map(completedCounts.map((c) => [c.driverId, c._count._all]));
+
     return {
-      items: items.map(toDTO),
+      items: items.map((d) => toDTO(d, countByDriver.get(d.id) ?? 0)),
       pagination: {
         page: query.page,
         limit: query.limit,

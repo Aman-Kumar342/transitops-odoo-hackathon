@@ -152,6 +152,7 @@ export default function DriversPage() {
                     <Th>License</Th>
                     <Th>Category</Th>
                     <Th>Expiry</Th>
+                    <Th>Trip Compl.</Th>
                     <Th>Safety</Th>
                     <Th>Status</Th>
                   </tr>
@@ -165,6 +166,7 @@ export default function DriversPage() {
                       <Td>{d.licenseNumber}</Td>
                       <Td>{d.licenseCategory}</Td>
                       <Td><LicenseBadge expiryDate={d.licenseExpiryDate} expired={d.licenseExpired} /></Td>
+                      <Td>{d.tripsCompleted}</Td>
                       <Td>{d.safetyScore}</Td>
                       <Td><StatusBadge status={d.status} label={d.statusLabel} /></Td>
                     </tr>

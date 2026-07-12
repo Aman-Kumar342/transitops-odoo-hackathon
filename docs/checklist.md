@@ -11,12 +11,12 @@
 
 # Overall Progress
 
-- **Overall completion:** ~55% (Phases 0-5 done)
-- **Current phase:** Phase 5 complete, next: Phase 6 (Fuel & Expense Management)
-- **Completed:** Phases 0-5 - foundation, auth/RBAC, vehicles, drivers, trips (with
-  transactional dispatch + race guard), and maintenance (In-Shop/close workflow) - all
-  with DB-level constraints, build green, verified against the live DB.
-- **Remaining:** Phases 6-10
+- **Overall completion:** ~64% (Phases 0-6 done)
+- **Current phase:** Phase 6 complete, next: Phase 7 (Dashboard KPIs)
+- **Completed:** Phases 0-6 - foundation, auth/RBAC, vehicles, drivers, trips (with
+  transactional dispatch + race guard), maintenance, and fuel/expense/operational-cost -
+  all with DB-level constraints, build green, verified against the live DB.
+- **Remaining:** Phases 7-10
 - **Blocked:** none. DB is live on the user's VPS (isolated `transitops` DB) reached via
   SSH tunnel on local port 55432. Postgres localhost-bound; only the `transitops` role +
   `transitops`/`transitops_shadow` DBs are used — no other VPS project touched.
@@ -52,7 +52,7 @@
 | 3 | Driver Management | 100% | ✅ Done (CRUD + status machine + eligibility verified) |
 | 4 | Trip Management + transitions | 100% | ✅ Done (transactional dispatch + race guard verified) |
 | 5 | Maintenance workflow | 100% | ✅ Done (In-Shop/close workflow + 18-D verified) |
-| 6 | Fuel & Expense | 0% | Not started |
+| 6 | Fuel & Expense | 100% | ✅ Done (CRUD + operational cost, no double count) |
 | 7 | Dashboard KPIs | 0% | Not started |
 | 8 | Reports & Analytics | 0% | Not started |
 | 9 | Bonus features | 0% | Not started |
@@ -405,43 +405,46 @@
 
 ---
 
-## Phase 6 — Fuel & Expense Management
+## Phase 6 — Fuel & Expense Management ✅
 
-- [ ] Database
-- [ ] Backend
-- [ ] Validation
-- [ ] APIs
-- [ ] UI
-- [ ] Testing
-- [ ] Edge Cases
-- [ ] Documentation
+- [x] Database — fuel_logs + expenses migrated with CHECKs, enum, indexes
+- [x] Backend — fuel/expense services + cost aggregation service
+- [x] Validation — zod schemas (liters>0, cost/amount>=0, no future date) + DB CHECK
+- [x] APIs — fuel-logs + expenses CRUD + operational-cost, RBAC-gated
+- [x] UI — fuel & expense pages (inline add/edit/delete) + cost card on vehicle detail
+- [x] Testing — CRUD, validation, aggregation, RBAC, DB backstop verified
+- [x] Edge Cases — zero liters, future date, no double count
+- [x] Documentation — synced
 
 **Fuel logs**
-- [ ] `fuel_logs` table + migration (vehicle_id, trip_id?, liters, cost, date, odometer 🟨, notes, audit)
-- [ ] CHECK liters>0, cost≥0
-- [ ] Index vehicle_id, date, trip_id
-- [ ] `GET/POST /fuel-logs`, `GET/PUT/DELETE /fuel-logs/:id`
-- [ ] Validation: liters>0, cost≥0, date ≤ today 🟨
-- [ ] UI: fuel list + add/edit form
+- [x] `fuel_logs` table + migration (vehicle_id, trip_id?, liters, cost, date, odometer 🟨, notes, audit)
+- [x] CHECK liters>0, cost>=0 (raw SQL)
+- [x] Index vehicle_id, date, trip_id
+- [x] `GET/POST /fuel-logs`, `GET/PUT/DELETE /fuel-logs/:id`
+- [x] Validation: liters>0, cost>=0, date not in future 🟨 - verified
+- [x] UI: fuel list + inline add/edit form + delete
 
 **Expenses**
-- [ ] `expenses` table + migration (vehicle_id, trip_id?, maintenance_id?, category, amount, date, description, audit)
-- [ ] CHECK amount≥0; category enum
-- [ ] Index vehicle_id, category, date
-- [ ] `GET/POST /expenses`, `GET/PUT/DELETE /expenses/:id`
-- [ ] Validation: amount≥0, date ≤ today 🟨, category ∈ enum
-- [ ] UI: expense list + add/edit form
+- [x] `expenses` table + migration (vehicle_id, trip_id?, category, amount, date, description, audit)
+- [x] CHECK amount>=0 (raw SQL); category ExpenseCategory enum (Toll/Parking/Insurance/Fine/Misc)
+- [x] Index vehicle_id, category, date
+- [x] `GET/POST /expenses`, `GET/PUT/DELETE /expenses/:id`
+- [x] Validation: amount>=0, date not in future 🟨, category in enum
+- [x] UI: expense list + inline add/edit form + delete
+- [x] Note (§18-E): Fuel/Maintenance are NOT expense categories - they have dedicated
+      tables (single source of truth), so expenses never double-count into operational cost
 
 **Operational cost**
-- [ ] Auto-compute total operational cost = Fuel + Maintenance per vehicle (§14)
-- [ ] `GET /vehicles/:id/operational-cost`
-- [ ] Avoid double-counting maintenance (§18-E)
-- [ ] Per-vehicle cost summary UI
+- [x] Auto-compute total operational cost = Fuel + Maintenance per vehicle (§14) - verified 10000
+- [x] `GET /vehicles/:id/operational-cost` (SQL SUM aggregates, no app loops)
+- [x] Avoid double-counting maintenance (§18-E) - expenses reported separately, verified
+- [x] Per-vehicle cost summary UI (card on vehicle detail)
 
 **Edge cases / tests**
-- [ ] Zero/negative liters rejected
-- [ ] Future-dated fuel/expense rejected 🟨
-- [ ] Aggregation correctness test
+- [x] Zero/negative liters rejected (API 400 + DB CHECK) - verified
+- [x] Future-dated fuel/expense rejected 🟨 - verified 400
+- [x] Aggregation correctness - verified (fuel 7500 + maint 2500 = 10000, expenses 350 separate)
+- [x] RBAC verified: Driver fuel create-only; Financial full; Safety none; DB backstop
 
 ---
 

@@ -12,6 +12,11 @@ const COLORS: Record<string, { bg: string; fg: string }> = {
   // Driver-specific
   OFF_DUTY: { bg: "rgba(91,100,114,0.16)", fg: "var(--status-retired)" },
   SUSPENDED: { bg: "rgba(192,57,43,0.14)", fg: "var(--color-danger)" },
+  // Trip
+  DRAFT: { bg: "var(--color-surface-2)", fg: "var(--color-text-muted)" },
+  DISPATCHED: { bg: "rgba(43,108,176,0.14)", fg: "var(--status-ontrip)" },
+  COMPLETED: { bg: "rgba(26,143,92,0.14)", fg: "var(--status-available)" },
+  CANCELLED: { bg: "rgba(192,57,43,0.12)", fg: "var(--color-danger)" },
 };
 
 const FALLBACK = { bg: "var(--color-surface-2)", fg: "var(--color-text-muted)" };

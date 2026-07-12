@@ -17,6 +17,7 @@ const NAV: { href: string; label: string }[] = [
   { href: "/", label: "Dashboard" },
   { href: "/vehicles", label: "Vehicles" },
   { href: "/drivers", label: "Drivers" },
+  { href: "/trips", label: "Trips" },
   { href: "/settings", label: "Settings" },
 ];
 

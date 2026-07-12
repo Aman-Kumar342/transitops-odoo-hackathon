@@ -38,12 +38,13 @@ export const tripRepository = {
   update(id: number, data: Prisma.TripUpdateInput) {
     return prisma.trip.update({ where: { id }, data, include: withParties });
   },
-  /** Completed-trip revenue + distance grouped by vehicle (for ROI / efficiency). */
+  /** Completed-trip revenue + distance + fuel consumed grouped by vehicle (for ROI /
+   *  efficiency). Fuel efficiency uses fuel CONSUMED on trips, not fuel purchased. */
   groupCompletedByVehicle() {
     return prisma.trip.groupBy({
       by: ["vehicleId"],
       where: { status: "COMPLETED" },
-      _sum: { revenue: true, plannedDistance: true },
+      _sum: { revenue: true, plannedDistance: true, fuelConsumed: true },
     });
   },
 

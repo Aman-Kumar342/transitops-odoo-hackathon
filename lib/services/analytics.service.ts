@@ -11,7 +11,8 @@ import { VEHICLE_STATUS } from "@/lib/domain/vehicle";
  * ("N/A" in the UI) rather than NaN/Infinity.
  *
  *   Fuel Efficiency  = Distance / Fuel (km/l)   [Distance = Σ planned_distance of
- *                      completed trips 🟨; Fuel = Σ fuel_logs liters]
+ *                      completed trips; Fuel = Σ fuel CONSUMED on completed trips (not
+ *                      fuel purchased) so the ratio reflects real trip economy 🟨]
  *   Operational Cost = Σ fuel cost + Σ maintenance cost           (§18-E)
  *   Vehicle ROI      = (Revenue − (Maintenance + Fuel)) / Acquisition Cost   (§18-F)
  *                      Revenue = Σ revenue of that vehicle's completed trips
@@ -77,6 +78,7 @@ export const analyticsService = {
       const maintenanceCost = toNum(maintBy.get(v.id)?.cost);
       const revenue = toNum(tripBy.get(v.id)?.revenue);
       const distance = toNum(tripBy.get(v.id)?.plannedDistance);
+      const tripFuel = toNum(tripBy.get(v.id)?.fuelConsumed); // fuel used on completed trips
       const acquisitionCost = toNum(v.acquisitionCost);
       const operationalCost = fuelCost + maintenanceCost;
       return {
@@ -90,23 +92,23 @@ export const analyticsService = {
         revenue,
         distance,
         acquisitionCost,
-        fuelEfficiency: fuelLiters > 0 ? round(distance / fuelLiters, 2) : null,
+        fuelEfficiency: tripFuel > 0 ? round(distance / tripFuel, 2) : null,
         roi: acquisitionCost > 0 ? round(((revenue - operationalCost) / acquisitionCost) * 100, 1) : null,
       };
     });
 
     // Fleet totals.
     const totalFuelCost = sum(perVehicle, (p) => p.fuelCost);
-    const totalFuelLiters = sum(perVehicle, (p) => p.fuelLiters);
     const totalMaintenanceCost = sum(perVehicle, (p) => p.maintenanceCost);
     const totalRevenue = sum(perVehicle, (p) => p.revenue);
     const totalDistance = sum(perVehicle, (p) => p.distance);
+    const totalTripFuel = tripGroups.reduce((a, g) => a + toNum(g._sum.fuelConsumed), 0);
     const totalAcquisitionCost = sum(perVehicle, (p) => p.acquisitionCost);
     const operationalCost = totalFuelCost + totalMaintenanceCost;
 
     return {
       summary: {
-        fuelEfficiency: totalFuelLiters > 0 ? round(totalDistance / totalFuelLiters, 2) : null,
+        fuelEfficiency: totalTripFuel > 0 ? round(totalDistance / totalTripFuel, 2) : null,
         fleetUtilization: nonRetired > 0 ? Math.round((onTrip / nonRetired) * 100) : 0,
         operationalCost,
         roi: totalAcquisitionCost > 0 ? round(((totalRevenue - operationalCost) / totalAcquisitionCost) * 100, 1) : null,

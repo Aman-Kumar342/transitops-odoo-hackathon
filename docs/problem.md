@@ -1023,9 +1023,12 @@ by owners to fix data-entry errors. No physical delete cascades from vehicles/dr
 All formulas guard against divide-by-zero → return `N/A` (never NaN/Infinity).
 
 ### Fuel Efficiency = Distance / Fuel 🟥
-- **Per vehicle:** Σ(trip distance) / Σ(fuel liters). Distance = Σ planned_distance or
-  Σ(final − start odometer) 🟨; Fuel = Σ fuel_logs.liters (and/or trip.fuel_consumed).
-- **Dependency:** trips, fuel_logs. **If fuel = 0 → N/A.**
+- **Per vehicle:** Σ(completed-trip distance) / Σ(fuel consumed on those trips).
+  Distance = Σ planned_distance of completed trips 🟨; Fuel = Σ `trip.fuel_consumed`
+  (fuel used *on the trips*, NOT total fuel purchased — using purchased fuel/fuel_logs
+  would divide trip distance by tank fill-ups and understate efficiency). Implemented
+  this way in `analytics.service`.
+- **Dependency:** completed trips. **If trip fuel = 0 → N/A.**
 
 ### Fleet Utilization 🟥
 - Instantaneous: as §13. Period-based 🟨: Σ(active vehicle-hours) / Σ(available

@@ -51,7 +51,7 @@ async function main() {
 
   // 4. Trips (statuses kept consistent with vehicle/driver states set above)
   // Completed: VAN-05 + Alex (the §5 example: cargo 450 <= 500). Revenue captured.
-  const t1 = await prisma.trip.create({ data: { source: "Gandhinagar Depot", destination: "Ahmedabad Hub", vehicleId: van05.id, driverId: alex.id, cargoWeight: 450, plannedDistance: 38, status: "COMPLETED", startOdometer: 74412, finalOdometer: 74450, fuelConsumed: 5, revenue: 12000, dispatchedAt: date("2026-07-07"), completedAt: date("2026-07-07") } });
+  const t1 = await prisma.trip.create({ data: { source: "Gandhinagar Depot", destination: "Ahmedabad Hub", vehicleId: van05.id, driverId: alex.id, cargoWeight: 450, plannedDistance: 38, status: "COMPLETED", startOdometer: 74412, finalOdometer: 74450, fuelConsumed: 5, revenue: 26000, dispatchedAt: date("2026-07-07"), completedAt: date("2026-07-07") } });
   // Dispatched: TRUCK-11 + Priya (both On Trip).
   await prisma.trip.create({ data: { source: "Vatva Industrial Area", destination: "Sanand Warehouse", vehicleId: truck11.id, driverId: priya.id, cargoWeight: 3000, plannedDistance: 120, status: "DISPATCHED", startOdometer: 182000, dispatchedAt: date("2026-07-11") } });
   // Draft: MINI-08 + Ravi.
@@ -59,7 +59,7 @@ async function main() {
   // Cancelled.
   await prisma.trip.create({ data: { source: "Nadiad", destination: "Anand", vehicleId: truck04.id, driverId: suresh.id, cargoWeight: 800, plannedDistance: 45, status: "CANCELLED", cancelledAt: date("2026-07-06") } });
   // Completed: TRK-12 (revenue history).
-  const t5 = await prisma.trip.create({ data: { source: "Rajkot", destination: "Morbi", vehicleId: trk12.id, driverId: alex.id, cargoWeight: 500, plannedDistance: 60, status: "COMPLETED", startOdometer: 209940, finalOdometer: 210000, fuelConsumed: 22, revenue: 18000, dispatchedAt: date("2026-06-20"), completedAt: date("2026-06-20") } });
+  const t5 = await prisma.trip.create({ data: { source: "Rajkot", destination: "Morbi", vehicleId: trk12.id, driverId: alex.id, cargoWeight: 500, plannedDistance: 60, status: "COMPLETED", startOdometer: 209940, finalOdometer: 210000, fuelConsumed: 22, revenue: 42000, dispatchedAt: date("2026-06-20"), completedAt: date("2026-06-20") } });
   console.log("✔ Seeded 5 trips");
 
   // 5. Maintenance

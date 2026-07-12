@@ -56,17 +56,47 @@ model Vehicle {
   maxLoadCapacity    Decimal       @map("max_load_capacity") @db.Decimal(12, 2)
   odometer           Decimal       @default(0) @db.Decimal(12, 2)
   acquisitionCost    Decimal       @map("acquisition_cost") @db.Decimal(14, 2)
-  status             VehicleStatus @default(AVAILABLE)
+  status             VehicleStatus    @default(AVAILABLE)
   region             String?
-  retiredAt          DateTime?     @map("retired_at")
+  retiredAt          DateTime?        @map("retired_at")
   trips              Trip[]
-  createdAt          DateTime      @default(now()) @map("created_at")
-  updatedAt          DateTime      @updatedAt @map("updated_at")
+  maintenanceLogs    MaintenanceLog[]
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
 
   @@index([status])
   @@index([type])
   @@index([region])
   @@map("vehicles")
+}
+
+/// Maintenance record lifecycle (problem.md §7.4). Closed set.
+enum MaintenanceStatus {
+  OPEN
+  CLOSED
+}
+
+/// Vehicle maintenance/service records (problem.md §4.6, §6.6, §12).
+/// Opening a record sends the vehicle In Shop (R9); closing restores it (R10). The DB
+/// enforces at most one Open record per vehicle via a partial unique index (raw SQL),
+/// and cost >= 0 via a CHECK, so invalid data is rejected even if the API is bypassed.
+model MaintenanceLog {
+  id                Int               @id @default(autoincrement())
+  vehicleId         Int               @map("vehicle_id")
+  vehicle           Vehicle           @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  type              String
+  description       String?
+  cost              Decimal           @default(0) @db.Decimal(14, 2)
+  status            MaintenanceStatus @default(OPEN)
+  odometerAtService Decimal?          @map("odometer_at_service") @db.Decimal(12, 2)
+  openedAt          DateTime          @default(now()) @map("opened_at")
+  closedAt          DateTime?         @map("closed_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@index([vehicleId])
+  @@index([status])
+  @@map("maintenance_logs")
 }
 
 /// Authenticated accounts. Password is always stored hashed (bcrypt) — never plaintext.

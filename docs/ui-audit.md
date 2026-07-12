@@ -21,10 +21,10 @@ Functionally complete and internally consistent, but two high-impact brand/struc
 choices diverge from the mockup (accent color and sidebar treatment), and a few screens
 are missing secondary panels shown in the design.
 
-> **Fix progress:** P1 (Critical) is **done** — blue accent, dark sidebar, and split-panel
-> login are implemented and shipped. This lifts Visual Fidelity ~60 → ~85 and Layout
-> ~72 → ~85. Remaining: P2 (Settings General + RBAC matrix, trip stepper, driver
-> trip-compl column, fuel-expense total), P3 (polish), P4 (nice-to-have).
+> **Fix progress:** P1 (Critical) **done** — blue accent, dark sidebar, split-panel login.
+> P2 (Important) **done** — Settings General + live RBAC matrix, trip lifecycle stepper,
+> driver "Trip Compl." column, fuel-expense operational-cost strip. Together these lift
+> the projected match to **~88**. Remaining: P3 (polish), P4 (nice-to-have).
 
 | Category | Score | One-line reason |
 |---|:---:|---|
@@ -290,13 +290,13 @@ Effort key: XS ≈ <15 min · S ≈ 15–45 min · M ≈ 1–2 h · L ≈ half-d
 | 2 | `AppShell` + `globals.css` | **Dark sidebar** (`#212529`, ~190–224px, light text, blue active item) | Sidebar reads like the mockup's product chrome | Low | S | ✅ done |
 | 3 | `app/login` | **Two-panel split login** (dark brand panel + form card) | First-impression screen matches the design | Medium | M | ✅ done |
 
-## Priority 2 — Important (missing components judges will look for)
-| # | Page/Component | Issue | Expected outcome | Complexity | Effort |
-|---|---|---|---|---|---|
-| 4 | `app/settings` | Add **General settings** (depot, currency INR, distance unit) + **RBAC matrix table** (render from `rbac.ts`) | Settings screen matches mockup; showcases RBAC | Low–Med | M |
-| 5 | Trip detail/list | **Trip lifecycle stepper** (Draft→Dispatched→Completed→Cancelled) | Matches mockup's stage indicator | Low | S |
-| 6 | Drivers table | Add **"Trip Compl."** column (completed-trip count/%) | Column parity with mockup | Med (needs per-driver aggregate) | M |
-| 7 | Fuel & Expenses | **Fleet operational-cost summary strip** (Fuel + Maintenance total) on-screen | Headline number appears where the mockup shows it | Low | S |
+## Priority 2 — Important (missing components judges will look for) — ✅ DONE
+| # | Page/Component | Issue | Expected outcome | Complexity | Effort | Status |
+|---|---|---|---|---|---|---|
+| 4 | `app/settings` | Add **General settings** (depot, currency INR, distance unit) + **RBAC matrix table** (render from `rbac.ts`) | Settings screen matches mockup; showcases RBAC | Low–Med | M | ✅ done |
+| 5 | Trip detail/list | **Trip lifecycle stepper** (Draft→Dispatched→Completed→Cancelled) | Matches mockup's stage indicator | Low | S | ✅ done |
+| 6 | Drivers table | Add **"Trip Compl."** column (completed-trip count/%) | Column parity with mockup | Med (needs per-driver aggregate) | M | ✅ done |
+| 7 | Fuel & Expenses | **Fleet operational-cost summary strip** (Fuel + Maintenance total) on-screen | Headline number appears where the mockup shows it | Low | S | ✅ done |
 
 ## Priority 3 — Polish (raise Visual Fidelity/consistency)
 | # | Page/Component | Issue | Expected outcome | Complexity | Effort |

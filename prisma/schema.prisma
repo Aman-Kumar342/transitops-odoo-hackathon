@@ -59,6 +59,7 @@ model Vehicle {
   status             VehicleStatus @default(AVAILABLE)
   region             String?
   retiredAt          DateTime?     @map("retired_at")
+  trips              Trip[]
   createdAt          DateTime      @default(now()) @map("created_at")
   updatedAt          DateTime      @updatedAt @map("updated_at")
 
@@ -79,6 +80,7 @@ model User {
   isActive     Boolean   @default(true) @map("is_active")
   lastLoginAt  DateTime? @map("last_login_at")
   driver       Driver? // optional 1:1 link (§18-B) — a driver may (but need not) have a login
+  createdTrips Trip[] // trips this user created
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
@@ -110,10 +112,54 @@ model Driver {
   userId            Int?         @unique @map("user_id")
   user              User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   deletedAt         DateTime?    @map("deleted_at")
+  trips             Trip[]
   createdAt         DateTime     @default(now()) @map("created_at")
   updatedAt         DateTime     @updatedAt @map("updated_at")
 
   @@index([status])
   @@index([licenseExpiryDate])
   @@map("drivers")
+}
+
+/// Trip lifecycle states (problem.md §3.5, §7.3). Closed set.
+enum TripStatus {
+  DRAFT
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+/// Trips - the unit of dispatched work (problem.md §4.5, §6.5, §12).
+/// `revenue` is captured on completion (§18-F approved assumption) and feeds ROI.
+/// Race guard (R4): partial unique indexes (one DISPATCHED trip per vehicle and per
+/// driver) added via raw SQL in the migration; plus CHECK constraints. The DB enforces
+/// these even if the API is bypassed. (guidelines §10)
+model Trip {
+  id              Int        @id @default(autoincrement())
+  source          String
+  destination     String
+  vehicleId       Int        @map("vehicle_id")
+  vehicle         Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  driverId        Int        @map("driver_id")
+  driver          Driver     @relation(fields: [driverId], references: [id], onDelete: Restrict)
+  cargoWeight     Decimal    @map("cargo_weight") @db.Decimal(12, 2)
+  plannedDistance Decimal    @map("planned_distance") @db.Decimal(12, 2)
+  status          TripStatus @default(DRAFT)
+  startOdometer   Decimal?   @map("start_odometer") @db.Decimal(12, 2)
+  finalOdometer   Decimal?   @map("final_odometer") @db.Decimal(12, 2)
+  fuelConsumed    Decimal?   @map("fuel_consumed") @db.Decimal(12, 2)
+  revenue         Decimal?   @db.Decimal(14, 2)
+  dispatchedAt    DateTime?  @map("dispatched_at")
+  completedAt     DateTime?  @map("completed_at")
+  cancelledAt     DateTime?  @map("cancelled_at")
+  createdById     Int?       @map("created_by")
+  createdBy       User?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([vehicleId])
+  @@index([driverId])
+  @@index([createdAt])
+  @@map("trips")
 }

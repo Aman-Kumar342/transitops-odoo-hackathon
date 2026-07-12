@@ -50,22 +50,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        padding: "var(--space-5)",
-      }}
-    >
-      <div className="card" style={{ width: "100%", maxWidth: 380 }}>
-        <p style={{ color: "var(--color-primary)", fontWeight: 700, margin: 0 }}>
-          TransitOps
-        </p>
-        <h1 style={{ fontSize: 22 }}>Sign in</h1>
-        <p style={{ color: "var(--color-text-muted)", marginTop: 0 }}>
-          Access the transport operations platform.
-        </p>
+    <div className="login">
+      {/* Left brand panel (mockup) */}
+      <aside className="login__brand">
+        <div>
+          <h1>TransitOps</h1>
+          <p style={{ color: "#aeb6c2", marginTop: 4 }}>Smart Transport Operations Platform</p>
+        </div>
+        <div>
+          <p style={{ fontWeight: 600, color: "#fff", marginBottom: "var(--space-2)" }}>
+            One login, four roles:
+          </p>
+          <ul className="login__roles">
+            <li><b>Fleet Manager</b> → Fleet, Maintenance</li>
+            <li><b>Driver</b> → Trips, Dashboard</li>
+            <li><b>Safety Officer</b> → Drivers, Compliance</li>
+            <li><b>Financial Analyst</b> → Fuel &amp; Expenses, Analytics</li>
+          </ul>
+          <p style={{ color: "#7a828f", fontSize: 13, marginTop: "var(--space-3)" }}>
+            Access is scoped by role after login.
+          </p>
+        </div>
+        <div className="login__foot">TRANSITOPS © 2026 · RBAC ENABLED</div>
+      </aside>
+
+      {/* Right form panel */}
+      <div className="login__form">
+        <div className="card" style={{ width: "100%", maxWidth: 380 }}>
+          <h1 style={{ fontSize: 22, marginBottom: 0 }}>Sign in to your account</h1>
+          <p style={{ color: "var(--color-text-muted)", marginTop: 4 }}>
+            Enter your credentials to continue.
+          </p>
 
         <form onSubmit={onSubmit} noValidate>
           <label style={{ display: "block", marginBottom: "var(--space-4)" }}>
@@ -122,6 +137,7 @@ export default function LoginPage() {
             {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );
